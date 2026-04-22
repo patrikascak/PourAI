@@ -369,7 +369,9 @@ Odpovedz IBA validným JSON objektom bez žiadneho iného textu.`
       }
 
       const data = await response.json();
-      const result = JSON.parse(data.content[0].text.trim());
+      const raw = data.content[0].text.trim();
+      const clean = raw.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+      const result = JSON.parse(clean);
       showResult(result);
 
     } catch (e) {
