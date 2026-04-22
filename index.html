@@ -6,300 +6,211 @@
   <title>PourAI</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: #0F0F1A;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      min-height: 100vh;
-    }
-
-    header {
-      background: #1A1A2E;
-      border-bottom: 1px solid #2A2A3E;
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    header h1 {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    header span { font-size: 24px; }
-
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 24px 16px 60px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .api-key-box {
-      background: #1A1A2E;
-      border: 1px solid #2A2A3E;
-      border-radius: 12px;
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .api-key-box label {
-      font-size: 11px;
-      color: #666680;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-
-    .api-key-box input {
-      background: #0F0F1A;
-      border: 1px solid #2A2A3E;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 13px;
-      padding: 10px 12px;
-      width: 100%;
-      font-family: monospace;
-    }
-
-    .image-box {
-      background: #1A1A2E;
-      border: 1px solid #2A2A3E;
-      border-radius: 16px;
-      height: 300px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .image-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    .placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      color: #666680;
-    }
-
-    .placeholder .icon { font-size: 64px; }
-    .placeholder p { font-size: 15px; }
-
-    .btn-row {
-      display: flex;
-      gap: 12px;
-    }
-
-    button {
-      cursor: pointer;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 600;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: opacity 0.2s;
-    }
-
+    body { background: #0F0F1A; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+    header { background: #1A1A2E; border-bottom: 1px solid #2A2A3E; padding: 18px 24px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+    header h1 { font-size: 22px; font-weight: 700; }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .scan-counter { font-size: 12px; color: #9090B0; background: #2A2A3E; padding: 4px 10px; border-radius: 20px; }
+    .btn-logout { background: none; border: 1px solid #2A2A3E; color: #9090B0; border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+    .container { max-width: 500px; margin: 0 auto; padding: 24px 16px 60px; display: flex; flex-direction: column; gap: 16px; }
+    .card { background: #1A1A2E; border: 1px solid #2A2A3E; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .card h2 { font-size: 20px; font-weight: 700; text-align: center; }
+    .card p { font-size: 14px; color: #9090B0; text-align: center; }
+    label { font-size: 11px; color: #666680; text-transform: uppercase; letter-spacing: 0.8px; }
+    input[type="email"], input[type="password"] { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 8px; color: #fff; font-size: 15px; padding: 12px; width: 100%; }
+    input[type="email"]:focus, input[type="password"]:focus { outline: none; border-color: #6C63FF; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    button { cursor: pointer; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; padding: 14px 20px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
     button:active { opacity: 0.7; }
-
-    .btn-primary { background: #6C63FF; color: #fff; flex: 1; }
+    .btn-primary { background: #6C63FF; color: #fff; width: 100%; }
     .btn-secondary { background: #2A2A3E; color: #fff; flex: 1; }
-    .btn-analyze {
-      background: linear-gradient(135deg, #6C63FF, #9C63FF);
-      color: #fff;
-      width: 100%;
-      font-size: 16px;
-      padding: 16px;
-    }
-
-    .btn-analyze:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      padding: 32px;
-    }
-
-    .spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid #2A2A3E;
-      border-top-color: #6C63FF;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
+    .btn-analyze { background: linear-gradient(135deg, #6C63FF, #9C63FF); color: #fff; width: 100%; font-size: 16px; padding: 16px; }
+    .btn-analyze:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-row { display: flex; gap: 12px; }
+    .image-box { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 12px; height: 280px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .image-box img { width: 100%; height: 100%; object-fit: contain; }
+    .placeholder { display: flex; flex-direction: column; align-items: center; gap: 12px; color: #666680; }
+    .placeholder .icon { font-size: 56px; }
+    .placeholder p { font-size: 14px; }
+    .spinner { width: 36px; height: 36px; border: 3px solid #2A2A3E; border-top-color: #6C63FF; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loading p { color: #9090B0; font-size: 15px; }
-
-    .result-card {
-      background: #1A1A2E;
-      border: 1px solid #2A2A3E;
-      border-radius: 16px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .brand { font-size: 18px; font-weight: 700; line-height: 1.3; }
-
-    .vol-row {
-      display: flex;
-      align-items: center;
-    }
-
-    .vol-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .vol-label {
-      font-size: 11px;
-      color: #666680;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-
-    .vol-value {
-      font-size: 26px;
-      font-weight: 700;
-    }
-
-    .vol-divider {
-      width: 1px;
-      height: 40px;
-      background: #2A2A3E;
-    }
-
-    .progress-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .progress-track {
-      flex: 1;
-      height: 10px;
-      background: #2A2A3E;
-      border-radius: 5px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 5px;
-      transition: width 0.6s ease;
-    }
-
-    .progress-pct {
-      font-size: 14px;
-      font-weight: 700;
-      width: 42px;
-      text-align: right;
-    }
-
-    .notes {
-      font-size: 13px;
-      color: #9090B0;
-      font-style: italic;
-      line-height: 1.5;
-    }
-
-    .error-box {
-      background: #2A1A1A;
-      border: 1px solid #5A2A2A;
-      border-radius: 12px;
-      padding: 16px;
-      color: #FF6B6B;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
+    .loading { text-align: center; padding: 24px; display: flex; flex-direction: column; gap: 12px; align-items: center; }
+    .loading p { color: #9090B0; }
+    .result-card { background: #1A1A2E; border: 1px solid #2A2A3E; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .brand { font-size: 18px; font-weight: 700; }
+    .vol-row { display: flex; align-items: center; }
+    .vol-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .vol-label { font-size: 11px; color: #666680; text-transform: uppercase; letter-spacing: 0.8px; }
+    .vol-value { font-size: 26px; font-weight: 700; }
+    .vol-divider { width: 1px; height: 40px; background: #2A2A3E; }
+    .progress-row { display: flex; align-items: center; gap: 12px; }
+    .progress-track { flex: 1; height: 10px; background: #2A2A3E; border-radius: 5px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 5px; }
+    .progress-pct { font-size: 14px; font-weight: 700; width: 42px; text-align: right; }
+    .notes { font-size: 13px; color: #9090B0; font-style: italic; line-height: 1.5; }
+    .error-box { background: #2A1A1A; border: 1px solid #5A2A2A; border-radius: 12px; padding: 16px; color: #FF6B6B; font-size: 14px; }
+    .toggle-link { text-align: center; font-size: 14px; color: #9090B0; cursor: pointer; }
+    .toggle-link span { color: #6C63FF; text-decoration: underline; }
     input[type="file"] { display: none; }
+    #loginScreen { display: flex; }
+    #appScreen { display: none; }
   </style>
 </head>
 <body>
 
-<header>
-  <span>🍾</span>
-  <h1>PourAI</h1>
-</header>
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="container" style="justify-content: center; min-height: 100vh;">
+    <div class="card" style="margin-top: 60px;">
+      <div style="text-align:center; font-size: 48px;">🍾</div>
+      <h2>PourAI</h2>
+      <p>Inventúra alkoholu pre bary</p>
 
-<div class="container">
+      <div id="loginForm" style="display:flex; flex-direction:column; gap:16px;">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="bar@example.com" />
+        </div>
+        <div class="field">
+          <label>Heslo</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" />
+        </div>
+        <button class="btn-primary" onclick="login()">Prihlásiť sa</button>
+        <div class="toggle-link" onclick="showRegister()">Nemáš účet? <span>Zaregistruj sa</span></div>
+      </div>
 
-  <div class="api-key-box">
-    <label>Anthropic API kľúč</label>
-    <input type="password" id="apiKey" placeholder="sk-ant-..." />
-  </div>
+      <div id="registerForm" style="display:none; flex-direction:column; gap:16px;">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="regEmail" placeholder="bar@example.com" />
+        </div>
+        <div class="field">
+          <label>Heslo</label>
+          <input type="password" id="regPassword" placeholder="min. 6 znakov" />
+        </div>
+        <button class="btn-primary" onclick="register()">Vytvoriť účet</button>
+        <div class="toggle-link" onclick="showLogin()">Máš účet? <span>Prihlás sa</span></div>
+      </div>
 
-  <div class="image-box" id="imageBox">
-    <div class="placeholder">
-      <span class="icon">🍾</span>
-      <p>Odfotte alebo vyberte fľašu</p>
+      <div id="authOutput"></div>
     </div>
   </div>
+</div>
 
-  <div class="btn-row">
-    <button class="btn-primary" onclick="document.getElementById('cameraInput').click()">
-      📷 Fotoaparát
-    </button>
-    <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">
-      🖼️ Galéria
-    </button>
+<!-- APP -->
+<div id="appScreen">
+  <header>
+    <div class="header-left">
+      <span>🍾</span>
+      <h1>PourAI</h1>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span class="scan-counter" id="scanCounter">0 / 150</span>
+      <button class="btn-logout" onclick="logout()">Odhlásiť</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="image-box" id="imageBox">
+      <div class="placeholder">
+        <span class="icon">🍾</span>
+        <p>Odfotte alebo vyberte fľašu</p>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="document.getElementById('cameraInput').click()">📷 Fotoaparát</button>
+      <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">🖼️ Galéria</button>
+    </div>
+
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleFile(this)" />
+    <input type="file" id="galleryInput" accept="image/*" onchange="handleFile(this)" />
+
+    <button class="btn-analyze" id="analyzeBtn" disabled onclick="analyze()">🔍 Analyzovať fľašu</button>
+
+    <div id="output"></div>
   </div>
-
-  <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleFile(this)" />
-  <input type="file" id="galleryInput" accept="image/*" onchange="handleFile(this)" />
-
-  <button class="btn-analyze" id="analyzeBtn" disabled onclick="analyze()">
-    🔍 Analyzovať fľašu
-  </button>
-
-  <div id="output"></div>
-
 </div>
 
 <script>
+  const SUPABASE_URL = 'https://iowtbwejpixzwakchhls.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_R9FqKmhD23mtFPXkf2ZJqA_1qdh-3TA';
+  let token = null;
   let base64Data = null;
+
+  async function supabase(path, method, body, auth) {
+    const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY };
+    if (auth) headers['Authorization'] = 'Bearer ' + auth;
+    const res = await fetch(SUPABASE_URL + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    return res.json();
+  }
+
+  async function login() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const out = document.getElementById('authOutput');
+    out.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    const data = await supabase('/auth/v1/token?grant_type=password', 'POST', { email, password });
+    if (data.error) {
+      out.innerHTML = `<div class="error-box">❌ ${data.error_description || data.error}</div>`;
+      return;
+    }
+    token = data.access_token;
+    await loadUser();
+    showApp();
+  }
+
+  async function register() {
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const out = document.getElementById('authOutput');
+    out.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    const data = await supabase('/auth/v1/signup', 'POST', { email, password });
+    if (data.error) {
+      out.innerHTML = `<div class="error-box">❌ ${data.error_description || data.error}</div>`;
+      return;
+    }
+    out.innerHTML = `<div style="color:#4CAF50; text-align:center; padding:12px;">✅ Účet vytvorený! Skontroluj email pre potvrdenie.</div>`;
+  }
+
+  async function loadUser() {
+    const data = await supabase('/rest/v1/users?select=scans_this_month', 'GET', null, token);
+    if (data && data[0]) {
+      document.getElementById('scanCounter').textContent = data[0].scans_this_month + ' / 150';
+    }
+  }
+
+  function logout() {
+    token = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('appScreen').style.display = 'none';
+    document.getElementById('output').innerHTML = '';
+  }
+
+  function showApp() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+  }
+
+  function showRegister() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'flex';
+    document.getElementById('authOutput').innerHTML = '';
+  }
+
+  function showLogin() {
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'flex';
+    document.getElementById('authOutput').innerHTML = '';
+  }
 
   function handleFile(input) {
     const file = input.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (e) => {
-      const dataUrl = e.target.result;
-      base64Data = dataUrl.split(',')[1];
-
-      const box = document.getElementById('imageBox');
-      box.innerHTML = `<img src="${dataUrl}" alt="Fľaša" />`;
-
+      base64Data = e.target.result.split(',')[1];
+      document.getElementById('imageBox').innerHTML = `<img src="${e.target.result}" />`;
       document.getElementById('analyzeBtn').disabled = false;
       document.getElementById('output').innerHTML = '';
     };
@@ -313,103 +224,53 @@
   }
 
   async function analyze() {
-    const apiKey = document.getElementById('apiKey').value.trim();
-    if (!apiKey) {
-      document.getElementById('output').innerHTML = `<div class="error-box">⚠️ Zadaj Anthropic API kľúč</div>`;
-      return;
-    }
-    if (!base64Data) return;
-
-    document.getElementById('output').innerHTML = `
-      <div class="loading">
-        <div class="spinner"></div>
-        <p>Analyzujem fľašu...</p>
-      </div>`;
-
+    if (!base64Data || !token) return;
+    document.getElementById('output').innerHTML = `<div class="loading"><div class="spinner"></div><p>Analyzujem fľašu...</p></div>`;
     document.getElementById('analyzeBtn').disabled = true;
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch(SUPABASE_URL + '/functions/v1/super-endpoint', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
+          'Authorization': 'Bearer ' + token
         },
-        body: JSON.stringify({
-          model: 'claude-opus-4-5',
-          max_tokens: 1024,
-          messages: [{
-            role: 'user',
-            content: [
-              {
-                type: 'image',
-                source: { type: 'base64', media_type: 'image/jpeg', data: base64Data }
-              },
-              {
-                type: 'text',
-                text: `Analyzuj túto fľašu alkoholu a vráť JSON objekt s týmito poliami:
-- brand: názov značky a typ alkoholu (napr. "Jack Daniel's Old No. 7 Tennessee Whiskey")
-- totalVolumeMl: celkový objem fľaše v ml (číslo, napr. 700)
-- remainingMl: odhadovaný zostatok v ml na základe vizuálnej úrovne tekutiny (číslo)
-- remainingPercent: percentuálny zostatok (číslo 0-100)
-- notes: krátka poznámka o odhadovanom zostatku
-
-Odpovedz IBA validným JSON objektom bez žiadneho iného textu.`
-              }
-            ]
-          }]
-        })
+        body: JSON.stringify({ image: base64Data })
       });
 
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error?.message || 'API chyba');
-      }
+      const r = await res.json();
+      if (r.error) throw new Error(r.error);
 
-      const data = await response.json();
-      const raw = data.content[0].text.trim();
-      const clean = raw.replace(/```json\n?/g, '').replace(/```/g, '').trim();
-      const result = JSON.parse(clean);
-      showResult(result);
-
+      const color = getColor(r.remainingPercent);
+      document.getElementById('scanCounter').textContent = r.scansUsed + ' / 150';
+      document.getElementById('output').innerHTML = `
+        <div class="result-card">
+          <div class="brand">${r.brand}</div>
+          <div class="vol-row">
+            <div class="vol-item">
+              <span class="vol-label">Celkový objem</span>
+              <span class="vol-value">${r.totalVolumeMl} ml</span>
+            </div>
+            <div class="vol-divider"></div>
+            <div class="vol-item">
+              <span class="vol-label">Zostatok</span>
+              <span class="vol-value" style="color:${color}">${r.remainingMl} ml</span>
+            </div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${r.remainingPercent}%;background:${color}"></div>
+            </div>
+            <span class="progress-pct" style="color:${color}">${r.remainingPercent}%</span>
+          </div>
+          ${r.notes ? `<div class="notes">${r.notes}</div>` : ''}
+        </div>`;
     } catch (e) {
-      document.getElementById('output').innerHTML = `<div class="error-box">❌ Chyba: ${e.message}</div>`;
+      document.getElementById('output').innerHTML = `<div class="error-box">❌ ${e.message}</div>`;
     } finally {
       document.getElementById('analyzeBtn').disabled = false;
     }
   }
-
-  function showResult(r) {
-    const color = getColor(r.remainingPercent);
-    document.getElementById('output').innerHTML = `
-      <div class="result-card">
-        <div class="brand">${r.brand}</div>
-
-        <div class="vol-row">
-          <div class="vol-item">
-            <span class="vol-label">Celkový objem</span>
-            <span class="vol-value">${r.totalVolumeMl} ml</span>
-          </div>
-          <div class="vol-divider"></div>
-          <div class="vol-item">
-            <span class="vol-label">Zostatok</span>
-            <span class="vol-value" style="color:${color}">${r.remainingMl} ml</span>
-          </div>
-        </div>
-
-        <div class="progress-row">
-          <div class="progress-track">
-            <div class="progress-fill" style="width:${r.remainingPercent}%;background:${color}"></div>
-          </div>
-          <span class="progress-pct" style="color:${color}">${r.remainingPercent}%</span>
-        </div>
-
-        ${r.notes ? `<div class="notes">${r.notes}</div>` : ''}
-      </div>`;
-  }
 </script>
-
 </body>
 </html>
