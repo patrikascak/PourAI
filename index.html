@@ -174,10 +174,8 @@
   }
 
   async function loadUser() {
-    const data = await supabase('/rest/v1/users?select=scans_this_month', 'GET', null, token);
-    if (data && data[0]) {
-      document.getElementById('scanCounter').textContent = data[0].scans_this_month + ' / 150';
-    }
+  document.getElementById('scanCounter').textContent = '0 / 150';
+}
   }
 
   function logout() {
