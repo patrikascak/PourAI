@@ -229,7 +229,7 @@
     document.getElementById('analyzeBtn').disabled = true;
 
     try {
-      const res = await fetch(SUPABASE_URL + '/functions/v1/analyze', {
+      const res = await fetch(SUPABASE_URL + '/functions/v1/super-endpoint', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
