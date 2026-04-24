@@ -310,22 +310,38 @@
   }
 
   async function loadHistory() {
-    const data = await api('/rest/v1/inventories?order=created_at.desc&select=*');
-    const list = document.getElementById('invList');
-    if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadne inventúry</p>'; return; }
-    list.innerHTML = data.map(inv => {
-      const date = new Date(inv.created_at).toLocaleDateString('sk-SK');
-      const badge = inv.status === 'open' ? '<span class="badge-open">Aktívna</span>' : '<span class="badge-closed">Uzavretá</span>';
-      return `<div class="inv-item" onclick="openDetail('${inv.id}')">
-        <div class="inv-item-left">
-          <div class="inv-item-name">${inv.name}</div>
-          <div class="inv-item-meta">${date}</div>
-        </div>
-        <div class="inv-item-right">${badge}<span style="font-size:20px;color:#666680">›</span></div>
-      </div>`;
-    }).join('');
-  }
+  const data = await api('/rest/v1/inventories?order=created_at.desc&select=*');
+  const list = document.getElementById('invList');
+  if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadne inventúry</p>'; return; }
+  list.innerHTML = data.map(inv => {
+    const date = new Date(inv.created_at).toLocaleDateString('sk-SK');
+    const badge = inv.status === 'open' 
+      ? '<span class="badge-open">Aktívna</span>' 
+      : '<span class="badge-closed">Uzavretá</span>';
+    const action = inv.status === 'open'
+      ? `<button onclick="continueInventory('${inv.id}')" style="background:#1A2A1A;border:1px solid #2A5A2A;color:#4CAF50;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;width:auto;">▶️ Pokračovať</button>`
+      : '';
+    return `<div class="inv-item">
+      <div class="inv-item-left" onclick="openDetail('${inv.id}')" style="cursor:pointer;flex:1;">
+        <div class="inv-item-name">${inv.name}</div>
+        <div class="inv-item-meta">${date}</div>
+      </div>
+      <div class="inv-item-right" style="gap:8px;">
+        ${badge}
+        ${action}
+        <span onclick="openDetail('${inv.id}')" style="font-size:20px;color:#666680;cursor:pointer;">›</span>
+      </div>
+    </div>`;
+  }).join('');
+}
 
+async function continueInventory(invId) {
+  const data = await api(`/rest/v1/inventories?id=eq.${invId}`);
+  currentInventory = data[0];
+  document.getElementById('activeInvName').textContent = currentInventory.name;
+  await loadActiveScans();
+  showScreen('activeScreen');
+}
   async function openDetail(invId) {
     const invData = await api(`/rest/v1/inventories?id=eq.${invId}`);
     detailInventory = invData[0];
