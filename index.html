@@ -65,7 +65,7 @@
     .scan-item-ml { font-size: 15px; font-weight: 700; }
     .scan-item-pct { font-size: 12px; color: #666680; }
     .inv-list { display: flex; flex-direction: column; gap: 10px; }
-    .inv-item { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: border-color 0.2s; }
+    .inv-item { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.2s; }
     .inv-item:hover { border-color: #6C63FF; }
     .inv-item-left { display: flex; flex-direction: column; gap: 4px; }
     .inv-item-name { font-size: 15px; font-weight: 600; }
@@ -78,6 +78,7 @@
     .nav-tabs { display: flex; gap: 4px; background: #0F0F1A; border-radius: 10px; padding: 4px; }
     .nav-tab { flex: 1; background: none; border: none; color: #666680; font-size: 13px; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: 500; }
     .nav-tab.active { background: #2A2A3E; color: #fff; }
+    .admin-btn-sm { background: none; border: 1px solid #3A3A4E; color: #9090B0; border-radius: 8px; padding: 5px 10px; font-size: 12px; cursor: pointer; width: auto; }
     input[type="file"] { display: none; }
     #loginScreen { display: flex; min-height: 100vh; align-items: center; }
     #appScreen { display: none; }
@@ -113,8 +114,9 @@
 <div id="appScreen">
   <header>
     <div class="header-left"><span>🍾</span><h1>PourAI</h1></div>
-    <div style="display:flex;align-items:center;gap:10px;">
+    <div style="display:flex;align-items:center;gap:8px;">
       <span class="scan-counter" id="scanCounter">0 / 150</span>
+      <button id="adminBtn" class="btn-logout" onclick="showAdmin()" style="display:none;">🔧</button>
       <button class="btn-logout" onclick="logout()">Odhlásiť</button>
     </div>
   </header>
@@ -126,11 +128,9 @@
       <button class="nav-tab" onclick="showTab('tabHistory')">📋 História</button>
     </div>
 
-    <!-- NOVÁ INVENTÚRA -->
     <div id="tabNew" class="card">
       <h2>Nová inventúra</h2>
-      <div>
-        <label>Typ inventúry</label>
+      <div><label>Typ inventúry</label>
         <select id="invType" onchange="onInvTypeChange()">
           <option value="day">Denná</option>
           <option value="week">Týždenná</option>
@@ -151,7 +151,6 @@
       <button class="btn-primary" onclick="startInventory()">▶️ Začať inventúru</button>
     </div>
 
-    <!-- HISTÓRIA -->
     <div id="tabHistory" style="display:none;" class="card">
       <h2>História inventúr</h2>
       <div class="inv-list" id="invList"><div class="loading"><div class="spinner"></div></div></div>
@@ -205,7 +204,6 @@
         <div id="detailBadge"></div>
       </div>
     </div>
-
     <div class="card">
       <h2>📊 Export</h2>
       <div class="export-row">
@@ -213,7 +211,6 @@
         <button class="btn-secondary" onclick="exportPDF()">📄 PDF</button>
       </div>
     </div>
-
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <h2>📦 Fľaše</h2>
@@ -222,6 +219,32 @@
       <div class="scans-list" id="detailScansList"></div>
     </div>
   </div>
+
+  <!-- ADMIN -->
+  <div id="adminScreen" class="container" style="display:none;">
+    <div class="card">
+      <button class="btn-back" onclick="goHome(true)">← Späť</button>
+      <h2>🔧 Admin panel</h2>
+    </div>
+
+    <div class="card">
+      <h2>👥 Užívatelia</h2>
+      <div class="inv-list" id="adminUsersList"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+
+    <div class="card">
+      <h2>📋 Všetky inventúry</h2>
+      <div class="inv-list" id="adminInvList"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+
+    <div class="card">
+      <h2>🗑️ Vymazať sken</h2>
+      <p style="color:#666680;font-size:14px;">Zadaj ID skenu ktorý chceš vymazať</p>
+      <input type="text" id="deleteScanId" placeholder="ID skenu" />
+      <button class="btn-danger" onclick="deleteScan()">🗑️ Vymazať sken</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -254,9 +277,17 @@
     if (data.error) { out.innerHTML = `<div class="error-box">❌ ${data.error_description || data.error}</div>`; return; }
     token = data.access_token;
     userId = data.user.id;
+    // Skontroluj admin
+    const userData = await api(`/rest/v1/users?id=eq.${userId}&select=is_admin,scans_this_month`);
+    if (userData && userData[0]?.is_admin) {
+      document.getElementById('adminBtn').style.display = 'block';
+    }
+    if (userData && userData[0]) {
+      document.getElementById('scanCounter').textContent = userData[0].scans_this_month + ' / 150';
+    }
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appScreen').style.display = 'block';
-    goHome(true);
+    goHome();
   }
 
   async function register() {
@@ -271,6 +302,7 @@
 
   function logout() {
     token = null; userId = null; currentInventory = null;
+    document.getElementById('adminBtn').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('appScreen').style.display = 'none';
   }
@@ -279,19 +311,21 @@
   function showLogin() { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'flex'; document.getElementById('authOutput').innerHTML = ''; }
 
   function showScreen(name) {
-    ['homeScreen','activeScreen','detailScreen'].forEach(s => document.getElementById(s).style.display = 'none');
+    ['homeScreen','activeScreen','detailScreen','adminScreen'].forEach(s => {
+      document.getElementById(s).style.display = 'none';
+    });
     document.getElementById(name).style.display = 'flex';
     document.getElementById(name).style.flexDirection = 'column';
   }
 
   async function goHome(skipActiveCheck = false) {
-  showScreen('homeScreen');
-  onInvTypeChange();
-  await loadHistory();
-  if (!skipActiveCheck) {
-    await checkActiveInventory();
+    showScreen('homeScreen');
+    onInvTypeChange();
+    await loadHistory();
+    if (!skipActiveCheck) {
+      await checkActiveInventory();
+    }
   }
-}
 
   function showTab(tab) {
     ['tabNew','tabHistory'].forEach(t => { document.getElementById(t).style.display = 'none'; });
@@ -310,51 +344,46 @@
   }
 
   async function loadHistory() {
-  const data = await api('/rest/v1/inventories?order=created_at.desc&select=*');
-  const list = document.getElementById('invList');
-  if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadne inventúry</p>'; return; }
-  list.innerHTML = data.map(inv => {
-    const date = new Date(inv.created_at).toLocaleDateString('sk-SK');
-    const badge = inv.status === 'open' 
-      ? '<span class="badge-open">Aktívna</span>' 
-      : '<span class="badge-closed">Uzavretá</span>';
-    const action = inv.status === 'open'
-      ? `<button onclick="continueInventory('${inv.id}')" style="background:#1A2A1A;border:1px solid #2A5A2A;color:#4CAF50;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;width:auto;">▶️ Pokračovať</button>`
-      : '';
-    return `<div class="inv-item">
-      <div class="inv-item-left" onclick="openDetail('${inv.id}')" style="cursor:pointer;flex:1;">
-        <div class="inv-item-name">${inv.name}</div>
-        <div class="inv-item-meta">${date}</div>
-      </div>
-      <div class="inv-item-right" style="gap:8px;">
-        ${badge}
-        ${action}
-        <span onclick="openDetail('${inv.id}')" style="font-size:20px;color:#666680;cursor:pointer;">›</span>
-      </div>
-    </div>`;
-  }).join('');
-}
+    const data = await api('/rest/v1/inventories?order=created_at.desc&select=*');
+    const list = document.getElementById('invList');
+    if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadne inventúry</p>'; return; }
+    list.innerHTML = data.map(inv => {
+      const date = new Date(inv.created_at).toLocaleDateString('sk-SK');
+      const badge = inv.status === 'open' ? '<span class="badge-open">Aktívna</span>' : '<span class="badge-closed">Uzavretá</span>';
+      const continueBtn = inv.status === 'open' ? `<button onclick="continueInventory('${inv.id}')" style="background:#1A2A1A;border:1px solid #2A5A2A;color:#4CAF50;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;width:auto;">▶️ Pokračovať</button>` : '';
+      return `<div class="inv-item">
+        <div class="inv-item-left" onclick="openDetail('${inv.id}')" style="flex:1;cursor:pointer;">
+          <div class="inv-item-name">${inv.name}</div>
+          <div class="inv-item-meta">${date}</div>
+        </div>
+        <div class="inv-item-right" style="gap:6px;">
+          ${badge}
+          ${continueBtn}
+          <span onclick="openDetail('${inv.id}')" style="font-size:20px;color:#666680;cursor:pointer;">›</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
 
-async function continueInventory(invId) {
-  const data = await api(`/rest/v1/inventories?id=eq.${invId}`);
-  currentInventory = data[0];
-  document.getElementById('activeInvName').textContent = currentInventory.name;
-  await loadActiveScans();
-  showScreen('activeScreen');
-}
+  async function continueInventory(invId) {
+    const data = await api(`/rest/v1/inventories?id=eq.${invId}`);
+    currentInventory = data[0];
+    document.getElementById('activeInvName').textContent = currentInventory.name;
+    await loadActiveScans();
+    showScreen('activeScreen');
+  }
+
   async function openDetail(invId) {
     const invData = await api(`/rest/v1/inventories?id=eq.${invId}`);
     detailInventory = invData[0];
     const scans = await api(`/rest/v1/scans?inventory_id=eq.${invId}&order=created_at.desc`);
     detailScans = scans || [];
-
     document.getElementById('detailInvName').textContent = detailInventory.name;
     const created = new Date(detailInventory.created_at).toLocaleDateString('sk-SK');
     const closed = detailInventory.closed_at ? new Date(detailInventory.closed_at).toLocaleDateString('sk-SK') : null;
     document.getElementById('detailInvMeta').textContent = closed ? `${created} — ${closed}` : `Vytvorená: ${created}`;
     document.getElementById('detailBadge').innerHTML = detailInventory.status === 'open' ? '<span class="badge-open">Aktívna</span>' : '<span class="badge-closed">Uzavretá</span>';
     document.getElementById('detailCount').textContent = `${detailScans.length} fľaší`;
-
     const list = document.getElementById('detailScansList');
     if (detailScans.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadne skeny</p>'; }
     else {
@@ -377,30 +406,17 @@ async function continueInventory(invId) {
   }
 
   async function startInventory() {
-  const name = document.getElementById('invName').value.trim();
-  if (!name) { alert('Zadaj názov inventúry'); return; }
-  
-  // Skontroluj duplikát
-  const existing = await api(`/rest/v1/inventories?name=eq.${encodeURIComponent(name)}&status=eq.open`);
-  if (existing && existing.length > 0) {
-    alert(`Inventúra "${name}" už existuje a je aktívna!`);
-    return;
+    const name = document.getElementById('invName').value.trim();
+    if (!name) { alert('Zadaj názov inventúry'); return; }
+    const existing = await api(`/rest/v1/inventories?name=eq.${encodeURIComponent(name)}&status=eq.open`);
+    if (existing && existing.length > 0) { alert(`Inventúra "${name}" už existuje a je aktívna!`); return; }
+    await api('/rest/v1/inventories', 'POST', { user_id: userId, name: name, status: 'open' });
+    await checkActiveInventory();
   }
-  
-  await api('/rest/v1/inventories', 'POST', {
-    user_id: userId,
-    name: name,
-    status: 'open'
-  });
-  await checkActiveInventory();
-}
 
   async function closeInventory() {
     if (!confirm('Naozaj chceš uzavrieť inventúru?')) return;
-    await api(`/rest/v1/inventories?id=eq.${currentInventory.id}`, 'PATCH', {
-      status: 'closed',
-      closed_at: new Date().toISOString()
-    });
+    await api(`/rest/v1/inventories?id=eq.${currentInventory.id}`, 'PATCH', { status: 'closed', closed_at: new Date().toISOString() });
     currentInventory = null;
     goHome(true);
   }
@@ -428,6 +444,81 @@ async function continueInventory(invId) {
     }
   }
 
+  // ADMIN FUNKCIE
+  async function showAdmin() {
+    showScreen('adminScreen');
+    await loadAdminUsers();
+    await loadAdminInventories();
+  }
+
+  async function loadAdminUsers() {
+    const data = await api('/rest/v1/users?select=*&order=created_at.desc');
+    const list = document.getElementById('adminUsersList');
+    if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadni užívatelia</p>'; return; }
+    list.innerHTML = data.map(u => `
+      <div class="inv-item" style="flex-wrap:wrap;gap:10px;">
+        <div class="inv-item-left" style="flex:1;">
+          <div class="inv-item-name" style="font-size:13px;">${u.email}</div>
+          <div class="inv-item-meta">Skeny: ${u.scans_this_month}/150 · ${u.is_active ? '🟢 Aktívny' : '🔴 Neaktívny'}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button onclick="toggleUser('${u.id}', ${u.is_active})" class="admin-btn-sm" style="color:${u.is_active ? '#FF6B6B' : '#4CAF50'};">
+            ${u.is_active ? 'Deaktivovať' : 'Aktivovať'}
+          </button>
+          <button onclick="resetScans('${u.id}')" class="admin-btn-sm">Reset skenov</button>
+        </div>
+      </div>`).join('');
+  }
+
+  async function toggleUser(id, currentStatus) {
+    await api(`/rest/v1/users?id=eq.${id}`, 'PATCH', { is_active: !currentStatus });
+    await loadAdminUsers();
+  }
+
+  async function resetScans(id) {
+    if (!confirm('Naozaj resetovať počet skenov?')) return;
+    await api(`/rest/v1/users?id=eq.${id}`, 'PATCH', { scans_this_month: 0 });
+    await loadAdminUsers();
+  }
+
+  async function loadAdminInventories() {
+    const data = await api('/rest/v1/inventories?select=*&order=created_at.desc');
+    const list = document.getElementById('adminInvList');
+    if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadne inventúry</p>'; return; }
+    list.innerHTML = data.map(inv => `
+      <div class="inv-item" style="flex-wrap:wrap;gap:10px;">
+        <div class="inv-item-left" style="flex:1;">
+          <div class="inv-item-name">${inv.name}</div>
+          <div class="inv-item-meta">${new Date(inv.created_at).toLocaleDateString('sk-SK')} · ${inv.status === 'open' ? '🟢 Aktívna' : '🔴 Uzavretá'}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${inv.status === 'closed' ? `<button onclick="reopenInventory('${inv.id}')" class="admin-btn-sm" style="color:#63B3FF;">Otvoriť</button>` : ''}
+          <button onclick="adminDeleteInventory('${inv.id}')" class="admin-btn-sm" style="color:#FF6B6B;">Vymazať</button>
+        </div>
+      </div>`).join('');
+  }
+
+  async function reopenInventory(id) {
+    await api(`/rest/v1/inventories?id=eq.${id}`, 'PATCH', { status: 'open', closed_at: null });
+    await loadAdminInventories();
+  }
+
+  async function adminDeleteInventory(id) {
+    if (!confirm('Vymazať celú inventúru aj so všetkými skenmi?')) return;
+    await api(`/rest/v1/scans?inventory_id=eq.${id}`, 'DELETE');
+    await api(`/rest/v1/inventories?id=eq.${id}`, 'DELETE');
+    await loadAdminInventories();
+  }
+
+  async function deleteScan() {
+    const id = document.getElementById('deleteScanId').value.trim();
+    if (!id) { alert('Zadaj ID skenu'); return; }
+    if (!confirm('Naozaj vymazať tento sken?')) return;
+    await api(`/rest/v1/scans?id=eq.${id}`, 'DELETE');
+    document.getElementById('deleteScanId').value = '';
+    alert('Sken vymazaný!');
+  }
+
   function onInvTypeChange() {
     const type = document.getElementById('invType')?.value;
     if (!type) return;
@@ -440,12 +531,12 @@ async function continueInventory(invId) {
 
     if (type === 'day') {
       picker.style.display = 'block';
-      picker.innerHTML = `<label>Dátum</label><input type="date" id="invDay" value="${now.toISOString().split('T')[0]}" />`;
+      picker.innerHTML = `<label>Dátum</label><input type="date" id="invDay" value="${now.toISOString().split('T')[0]}" onchange="document.getElementById('invName').value=new Date(this.value).toLocaleDateString('sk-SK')" />`;
       nameInput.value = now.toLocaleDateString('sk-SK');
     } else if (type === 'week') {
       const monday = new Date(now); monday.setDate(now.getDate() - now.getDay() + 1);
       picker.style.display = 'block';
-      picker.innerHTML = `<label>Začiatok týždňa</label><input type="date" id="invWeek" value="${monday.toISOString().split('T')[0]}" />`;
+      picker.innerHTML = `<label>Začiatok týždňa</label><input type="date" id="invWeek" value="${monday.toISOString().split('T')[0]}" onchange="document.getElementById('invName').value='Týždeň od '+new Date(this.value).toLocaleDateString('sk-SK')" />`;
       nameInput.value = `Týždeň od ${monday.toLocaleDateString('sk-SK')}`;
     } else if (type === 'month') {
       picker.style.display = 'block';
@@ -488,37 +579,37 @@ async function continueInventory(invId) {
   }
 
   async function handleFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-
-  // Hash z originálneho súboru
-  const originalBuffer = await file.arrayBuffer();
-  const hashBuffer = await crypto.subtle.digest('SHA-256', originalBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  window.currentImageHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 32);
-
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const dataUrl = e.target.result;
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const MAX = 1200;
-      let w = img.width, h = img.height;
-      if (w > MAX) { h = h * MAX / w; w = MAX; }
-      if (h > MAX) { w = w * MAX / h; h = MAX; }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const jpeg = canvas.toDataURL('image/jpeg', 0.85);
-      base64Data = jpeg.split(',')[1];
-      document.getElementById('imageBox').innerHTML = `<img src="${jpeg}" />`;
-      document.getElementById('analyzeBtn').disabled = false;
-      document.getElementById('output').innerHTML = '';
+    const file = input.files[0];
+    if (!file) return;
+    const originalBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', originalBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    window.currentImageHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 32);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const dataUrl = e.target.result;
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = h * MAX / w; w = MAX; }
+        if (h > MAX) { w = w * MAX / h; h = MAX; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const jpeg = canvas.toDataURL('image/jpeg', 0.85);
+        base64Data = jpeg.split(',')[1];
+        document.getElementById('imageBox').innerHTML = `<img src="${jpeg}" />`;
+        document.getElementById('analyzeBtn').disabled = false;
+        document.getElementById('output').innerHTML = '';
+      };
+      img.onerror = () => {
+        document.getElementById('output').innerHTML = `<div class="error-box">❌ Nepodporovaný formát. Použi JPG, PNG alebo WebP.</div>`;
+      };
+      img.src = dataUrl;
     };
-    img.src = dataUrl;
-  };
-  reader.readAsDataURL(file);
-}
+    reader.readAsDataURL(file);
+  }
 
   function getColor(pct) {
     if (pct > 50) return '#4CAF50';
@@ -534,7 +625,7 @@ async function continueInventory(invId) {
       const res = await fetch(SUPABASE_URL + '/functions/v1/super-endpoint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': SUPABASE_KEY },
-        body: JSON.stringify({ image: base64Data, inventory_id: currentInventory.id })
+        body: JSON.stringify({ image: base64Data, inventory_id: currentInventory.id, image_hash: window.currentImageHash })
       });
       const r = await res.json();
       if (r.error) throw new Error(r.error);
@@ -555,7 +646,7 @@ async function continueInventory(invId) {
           </div>
           ${r.notes ? `<div class="notes">${r.notes}</div>` : ''}
         </div>`;
-      await loadActiveScans();
+      if (!r.duplicate) await loadActiveScans();
     } catch (e) {
       document.getElementById('output').innerHTML = `<div class="error-box">❌ ${e.message}</div>`;
     } finally {
