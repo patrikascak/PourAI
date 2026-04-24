@@ -4,90 +4,95 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PourAI</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #0F0F1A; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
-    header { background: #1A1A2E; border-bottom: 1px solid #2A2A3E; padding: 18px 24px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
-    header h1 { font-size: 22px; font-weight: 700; }
+    header { background: #1A1A2E; border-bottom: 1px solid #2A2A3E; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
     .header-left { display: flex; align-items: center; gap: 10px; }
+    header h1 { font-size: 20px; font-weight: 700; }
     .scan-counter { font-size: 12px; color: #9090B0; background: #2A2A3E; padding: 4px 10px; border-radius: 20px; }
     .btn-logout { background: none; border: 1px solid #2A2A3E; color: #9090B0; border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
-    .container { max-width: 500px; margin: 0 auto; padding: 24px 16px 60px; display: flex; flex-direction: column; gap: 16px; }
-    .card { background: #1A1A2E; border: 1px solid #2A2A3E; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
-    .card h2 { font-size: 20px; font-weight: 700; text-align: center; }
-    .card p { font-size: 14px; color: #9090B0; text-align: center; }
-    label { font-size: 11px; color: #666680; text-transform: uppercase; letter-spacing: 0.8px; }
-    input[type="email"], input[type="password"] { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 8px; color: #fff; font-size: 15px; padding: 12px; width: 100%; }
-    input[type="email"]:focus, input[type="password"]:focus { outline: none; border-color: #6C63FF; }
-    .field { display: flex; flex-direction: column; gap: 6px; }
-    button { cursor: pointer; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; padding: 14px 20px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
+    .container { max-width: 520px; margin: 0 auto; padding: 20px 16px 60px; display: flex; flex-direction: column; gap: 14px; }
+    .card { background: #1A1A2E; border: 1px solid #2A2A3E; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .card h2 { font-size: 18px; font-weight: 700; }
+    label { font-size: 11px; color: #666680; text-transform: uppercase; letter-spacing: 0.8px; display: block; margin-bottom: 6px; }
+    input[type="email"], input[type="password"], input[type="text"] { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 8px; color: #fff; font-size: 15px; padding: 12px; width: 100%; }
+    input:focus { outline: none; border-color: #6C63FF; }
+    button { cursor: pointer; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; padding: 13px 20px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; width: 100%; }
     button:active { opacity: 0.7; }
-    .btn-primary { background: #6C63FF; color: #fff; width: 100%; }
-    .btn-secondary { background: #2A2A3E; color: #fff; flex: 1; }
-    .btn-analyze { background: linear-gradient(135deg, #6C63FF, #9C63FF); color: #fff; width: 100%; font-size: 16px; padding: 16px; }
-    .btn-analyze:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-row { display: flex; gap: 12px; }
-    .image-box { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 12px; height: 280px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: #6C63FF; color: #fff; }
+    .btn-secondary { background: #2A2A3E; color: #fff; }
+    .btn-danger { background: #3A1A1A; color: #FF6B6B; border: 1px solid #5A2A2A; }
+    .btn-success { background: #1A3A2A; color: #4CAF50; border: 1px solid #2A5A3A; }
+    .btn-analyze { background: linear-gradient(135deg, #6C63FF, #9C63FF); color: #fff; font-size: 16px; padding: 15px; }
+    .btn-row { display: flex; gap: 10px; }
+    .btn-row button { flex: 1; }
+    .image-box { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 12px; height: 260px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .image-box img { width: 100%; height: 100%; object-fit: contain; }
-    .placeholder { display: flex; flex-direction: column; align-items: center; gap: 12px; color: #666680; }
-    .placeholder .icon { font-size: 56px; }
+    .placeholder { display: flex; flex-direction: column; align-items: center; gap: 10px; color: #666680; }
+    .placeholder .icon { font-size: 48px; }
     .placeholder p { font-size: 14px; }
-    .spinner { width: 36px; height: 36px; border: 3px solid #2A2A3E; border-top-color: #6C63FF; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+    .spinner { width: 32px; height: 32px; border: 3px solid #2A2A3E; border-top-color: #6C63FF; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading { text-align: center; padding: 24px; display: flex; flex-direction: column; gap: 12px; align-items: center; }
+    .loading { text-align: center; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
     .loading p { color: #9090B0; }
-    .result-card { background: #1A1A2E; border: 1px solid #2A2A3E; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-    .brand { font-size: 18px; font-weight: 700; }
+    .result-card { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .brand { font-size: 17px; font-weight: 700; }
     .vol-row { display: flex; align-items: center; }
     .vol-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .vol-label { font-size: 11px; color: #666680; text-transform: uppercase; letter-spacing: 0.8px; }
-    .vol-value { font-size: 26px; font-weight: 700; }
-    .vol-divider { width: 1px; height: 40px; background: #2A2A3E; }
-    .progress-row { display: flex; align-items: center; gap: 12px; }
-    .progress-track { flex: 1; height: 10px; background: #2A2A3E; border-radius: 5px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 5px; }
-    .progress-pct { font-size: 14px; font-weight: 700; width: 42px; text-align: right; }
+    .vol-value { font-size: 24px; font-weight: 700; }
+    .vol-divider { width: 1px; height: 36px; background: #2A2A3E; }
+    .progress-row { display: flex; align-items: center; gap: 10px; }
+    .progress-track { flex: 1; height: 8px; background: #2A2A3E; border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; }
+    .progress-pct { font-size: 13px; font-weight: 700; width: 38px; text-align: right; }
     .notes { font-size: 13px; color: #9090B0; font-style: italic; line-height: 1.5; }
-    .error-box { background: #2A1A1A; border: 1px solid #5A2A2A; border-radius: 12px; padding: 16px; color: #FF6B6B; font-size: 14px; }
+    .error-box { background: #2A1A1A; border: 1px solid #5A2A2A; border-radius: 12px; padding: 14px; color: #FF6B6B; font-size: 14px; }
+    .success-box { background: #1A2A1A; border: 1px solid #2A5A2A; border-radius: 12px; padding: 14px; color: #4CAF50; font-size: 14px; }
     .toggle-link { text-align: center; font-size: 14px; color: #9090B0; cursor: pointer; }
     .toggle-link span { color: #6C63FF; text-decoration: underline; }
+    .inventory-badge { display: inline-flex; align-items: center; gap: 6px; background: #1A2A1A; border: 1px solid #2A5A2A; color: #4CAF50; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .inventory-badge.closed { background: #2A2A3E; border-color: #3A3A4E; color: #9090B0; }
+    .scans-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+    .scan-item { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .scan-item-left { display: flex; flex-direction: column; gap: 3px; }
+    .scan-item-brand { font-size: 14px; font-weight: 600; }
+    .scan-item-time { font-size: 12px; color: #666680; }
+    .scan-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+    .scan-item-ml { font-size: 15px; font-weight: 700; }
+    .scan-item-pct { font-size: 12px; color: #666680; }
+    .export-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .export-row button { flex: 1; min-width: 120px; font-size: 13px; padding: 10px; }
+    .period-select { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 8px; color: #fff; font-size: 14px; padding: 10px; width: 100%; }
     input[type="file"] { display: none; }
-    #loginScreen { display: flex; }
+    #loginScreen { display: flex; min-height: 100vh; align-items: center; }
     #appScreen { display: none; }
+    select { background: #0F0F1A; border: 1px solid #2A2A3E; border-radius: 8px; color: #fff; font-size: 14px; padding: 10px; width: 100%; }
   </style>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div id="loginScreen">
-  <div class="container" style="justify-content: center; min-height: 100vh;">
-    <div class="card" style="margin-top: 60px;">
-      <div style="text-align:center; font-size: 48px;">🍾</div>
-      <h2>PourAI</h2>
-      <p>Inventúra alkoholu pre bary</p>
+  <div class="container" style="width:100%;">
+    <div class="card" style="margin-top:40px;">
+      <div style="text-align:center; font-size: 44px;">🍾</div>
+      <h2 style="text-align:center;">PourAI</h2>
+      <p style="text-align:center; color:#9090B0; font-size:14px;">Inventúra alkoholu pre bary</p>
 
-      <div id="loginForm" style="display:flex; flex-direction:column; gap:16px;">
-        <div class="field">
-          <label>Email</label>
-          <input type="email" id="loginEmail" placeholder="bar@example.com" />
-        </div>
-        <div class="field">
-          <label>Heslo</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" />
-        </div>
+      <div id="loginForm" style="display:flex; flex-direction:column; gap:14px;">
+        <div><label>Email</label><input type="email" id="loginEmail" placeholder="bar@example.com" /></div>
+        <div><label>Heslo</label><input type="password" id="loginPassword" placeholder="••••••••" /></div>
         <button class="btn-primary" onclick="login()">Prihlásiť sa</button>
         <div class="toggle-link" onclick="showRegister()">Nemáš účet? <span>Zaregistruj sa</span></div>
       </div>
 
-      <div id="registerForm" style="display:none; flex-direction:column; gap:16px;">
-        <div class="field">
-          <label>Email</label>
-          <input type="email" id="regEmail" placeholder="bar@example.com" />
-        </div>
-        <div class="field">
-          <label>Heslo</label>
-          <input type="password" id="regPassword" placeholder="min. 6 znakov" />
-        </div>
+      <div id="registerForm" style="display:none; flex-direction:column; gap:14px;">
+        <div><label>Email</label><input type="email" id="regEmail" placeholder="bar@example.com" /></div>
+        <div><label>Heslo</label><input type="password" id="regPassword" placeholder="min. 6 znakov" /></div>
         <button class="btn-primary" onclick="register()">Vytvoriť účet</button>
         <div class="toggle-link" onclick="showLogin()">Máš účet? <span>Prihlás sa</span></div>
       </div>
@@ -111,24 +116,59 @@
   </header>
 
   <div class="container">
-    <div class="image-box" id="imageBox">
-      <div class="placeholder">
-        <span class="icon">🍾</span>
-        <p>Odfotte alebo vyberte fľašu</p>
+
+    <!-- INVENTÚRA -->
+    <div class="card" id="inventoryCard">
+      <h2>📋 Inventúra</h2>
+      <div id="inventoryStatus"></div>
+      <div id="inventoryActions"></div>
+    </div>
+
+    <!-- SKENOVANIE -->
+    <div class="card" id="scanCard" style="display:none;">
+      <div class="image-box" id="imageBox">
+        <div class="placeholder">
+          <span class="icon">🍾</span>
+          <p>Odfotte alebo vyberte fľašu</p>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="document.getElementById('cameraInput').click()">📷 Fotoaparát</button>
+        <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">🖼️ Galéria</button>
+      </div>
+
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleFile(this)" />
+      <input type="file" id="galleryInput" accept="image/*" onchange="handleFile(this)" />
+
+      <button class="btn-analyze" id="analyzeBtn" disabled onclick="analyze()">🔍 Analyzovať fľašu</button>
+      <div id="output"></div>
+    </div>
+
+    <!-- ZOZNAM SKENOV -->
+    <div class="card" id="scansCard" style="display:none;">
+      <h2>📦 Naskenované fľaše</h2>
+      <div class="scans-list" id="scansList"></div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="card" id="exportCard" style="display:none;">
+      <h2>📊 Export</h2>
+      <div>
+        <label>Obdobie</label>
+        <select id="exportPeriod">
+          <option value="day">Dnes</option>
+          <option value="week">Tento týždeň</option>
+          <option value="month">Tento mesiac</option>
+          <option value="inventory">Aktuálna inventúra</option>
+        </select>
+      </div>
+      <div class="export-row">
+        <button class="btn-secondary" onclick="exportExcel()">📗 Export Excel</button>
+        <button class="btn-secondary" onclick="exportPDF()">📄 Export PDF</button>
       </div>
     </div>
 
-    <div class="btn-row">
-      <button class="btn-secondary" onclick="document.getElementById('cameraInput').click()">📷 Fotoaparát</button>
-      <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">🖼️ Galéria</button>
-    </div>
-
-    <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleFile(this)" />
-    <input type="file" id="galleryInput" accept="image/*" onchange="handleFile(this)" />
-
-    <button class="btn-analyze" id="analyzeBtn" disabled onclick="analyze()">🔍 Analyzovať fľašu</button>
-
-    <div id="output"></div>
   </div>
 </div>
 
@@ -137,10 +177,12 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlvd3Rid2VqcGl4endha2NoaGxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NzgxMDIsImV4cCI6MjA5MjQ1NDEwMn0.L6tX0L-pPvxXYBZ8JF4HT7XINh3lI83LGYYjwSB3Y4s';
   let token = null;
   let base64Data = null;
+  let currentInventory = null;
+  let currentScans = [];
 
-  async function supabase(path, method, body, auth) {
+  async function api(path, method = 'GET', body = null, auth = true) {
     const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY };
-    if (auth) headers['Authorization'] = 'Bearer ' + auth;
+    if (auth) headers['Authorization'] = 'Bearer ' + token;
     const res = await fetch(SUPABASE_URL + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
     return res.json();
   }
@@ -150,14 +192,11 @@
     const password = document.getElementById('loginPassword').value;
     const out = document.getElementById('authOutput');
     out.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-    const data = await supabase('/auth/v1/token?grant_type=password', 'POST', { email, password });
-    if (data.error) {
-      out.innerHTML = `<div class="error-box">❌ ${data.error_description || data.error}</div>`;
-      return;
-    }
+    const data = await api('/auth/v1/token?grant_type=password', 'POST', { email, password }, false);
+    if (data.error) { out.innerHTML = `<div class="error-box">❌ ${data.error_description || data.error}</div>`; return; }
     token = data.access_token;
-    await loadUser();
     showApp();
+    await loadInventory();
   }
 
   async function register() {
@@ -165,23 +204,15 @@
     const password = document.getElementById('regPassword').value;
     const out = document.getElementById('authOutput');
     out.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-    const data = await supabase('/auth/v1/signup', 'POST', { email, password });
-    if (data.error) {
-      out.innerHTML = `<div class="error-box">❌ ${data.error_description || data.error}</div>`;
-      return;
-    }
-    out.innerHTML = `<div style="color:#4CAF50; text-align:center; padding:12px;">✅ Účet vytvorený! Skontroluj email pre potvrdenie.</div>`;
-  }
-
-  async function loadUser() {
-  document.getElementById('scanCounter').textContent = '0 / 150';
+    const data = await api('/auth/v1/signup', 'POST', { email, password }, false);
+    if (data.error) { out.innerHTML = `<div class="error-box">❌ ${data.error_description || data.error}</div>`; return; }
+    out.innerHTML = `<div class="success-box">✅ Účet vytvorený! Skontroluj email.</div>`;
   }
 
   function logout() {
-    token = null;
+    token = null; currentInventory = null; currentScans = [];
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('appScreen').style.display = 'none';
-    document.getElementById('output').innerHTML = '';
   }
 
   function showApp() {
@@ -199,6 +230,89 @@
     document.getElementById('registerForm').style.display = 'none';
     document.getElementById('loginForm').style.display = 'flex';
     document.getElementById('authOutput').innerHTML = '';
+  }
+
+  async function loadInventory() {
+    const data = await api('/rest/v1/inventories?status=eq.open&order=created_at.desc&limit=1');
+    if (data && data.length > 0) {
+      currentInventory = data[0];
+      renderInventoryOpen();
+      await loadScans();
+    } else {
+      renderInventoryEmpty();
+    }
+  }
+
+  function renderInventoryEmpty() {
+    document.getElementById('inventoryStatus').innerHTML = '<p style="color:#666680; font-size:14px;">Žiadna aktívna inventúra</p>';
+    document.getElementById('inventoryActions').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div><label>Názov inventúry (voliteľné)</label><input type="text" id="invName" placeholder="napr. Streda večer" /></div>
+        <button class="btn-primary" onclick="startInventory()">▶️ Začať novú inventúru</button>
+      </div>`;
+    document.getElementById('scanCard').style.display = 'none';
+    document.getElementById('scansCard').style.display = 'none';
+    document.getElementById('exportCard').style.display = 'block';
+  }
+
+  function renderInventoryOpen() {
+    const date = new Date(currentInventory.created_at).toLocaleDateString('sk-SK');
+    document.getElementById('inventoryStatus').innerHTML = `
+      <div class="inventory-badge">🟢 Aktívna — ${currentInventory.name || date}</div>`;
+    document.getElementById('inventoryActions').innerHTML = `
+      <button class="btn-danger" onclick="closeInventory()">🔒 Uzavrieť inventúru</button>`;
+    document.getElementById('scanCard').style.display = 'flex';
+    document.getElementById('exportCard').style.display = 'block';
+  }
+
+  async function startInventory() {
+    const name = document.getElementById('invName').value.trim();
+    const data = await api('/rest/v1/inventories', 'POST', {
+      name: name || new Date().toLocaleDateString('sk-SK'),
+      status: 'open'
+    });
+    await loadInventory();
+  }
+
+  async function closeInventory() {
+    if (!confirm('Naozaj chceš uzavrieť inventúru? Nebude možné pridávať ďalšie skeny.')) return;
+    await api(`/rest/v1/inventories?id=eq.${currentInventory.id}`, 'PATCH', {
+      status: 'closed',
+      closed_at: new Date().toISOString()
+    });
+    currentInventory = null;
+    currentScans = [];
+    renderInventoryEmpty();
+    document.getElementById('scansList').innerHTML = '';
+    document.getElementById('scansCard').style.display = 'none';
+  }
+
+  async function loadScans() {
+    if (!currentInventory) return;
+    const data = await api(`/rest/v1/scans?inventory_id=eq.${currentInventory.id}&order=created_at.desc`);
+    if (data && data.length > 0) {
+      currentScans = data;
+      renderScans();
+      document.getElementById('scansCard').style.display = 'flex';
+    }
+  }
+
+  function renderScans() {
+    const list = document.getElementById('scansList');
+    list.innerHTML = currentScans.map(s => {
+      const color = s.remaining_percent > 50 ? '#4CAF50' : s.remaining_percent > 20 ? '#FF9800' : '#F44336';
+      const time = new Date(s.created_at).toLocaleTimeString('sk-SK', { hour: '2-digit', minute: '2-digit' });
+      return `<div class="scan-item">
+        <div class="scan-item-left">
+          <div class="scan-item-brand">${s.brand}</div>
+          <div class="scan-item-time">${time} · ${s.total_volume_ml}ml celkom</div>
+        </div>
+        <div class="scan-item-right">
+          <div class="scan-item-ml" style="color:${color}">${s.remaining_ml}ml</div>
+          <div class="scan-item-pct">${s.remaining_percent}%</div>
+        </div>
+      </div>`;
+    }).join('');
   }
 
   function handleFile(input) {
@@ -221,21 +335,16 @@
   }
 
   async function analyze() {
-    if (!base64Data || !token) return;
+    if (!base64Data || !token || !currentInventory) return;
     document.getElementById('output').innerHTML = `<div class="loading"><div class="spinner"></div><p>Analyzujem fľašu...</p></div>`;
     document.getElementById('analyzeBtn').disabled = true;
 
     try {
       const res = await fetch(SUPABASE_URL + '/functions/v1/super-endpoint', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token,
-          'apikey': SUPABASE_KEY
-        },
-        body: JSON.stringify({ image: base64Data })
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': SUPABASE_KEY },
+        body: JSON.stringify({ image: base64Data, inventory_id: currentInventory.id })
       });
-
       const r = await res.json();
       if (r.error) throw new Error(r.error);
 
@@ -256,18 +365,111 @@
             </div>
           </div>
           <div class="progress-row">
-            <div class="progress-track">
-              <div class="progress-fill" style="width:${r.remainingPercent}%;background:${color}"></div>
-            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:${r.remainingPercent}%;background:${color}"></div></div>
             <span class="progress-pct" style="color:${color}">${r.remainingPercent}%</span>
           </div>
           ${r.notes ? `<div class="notes">${r.notes}</div>` : ''}
         </div>`;
+
+      await loadScans();
     } catch (e) {
       document.getElementById('output').innerHTML = `<div class="error-box">❌ ${e.message}</div>`;
     } finally {
       document.getElementById('analyzeBtn').disabled = false;
     }
+  }
+
+  async function getExportData() {
+    const period = document.getElementById('exportPeriod').value;
+    let url = '/rest/v1/scans?order=created_at.desc';
+    const now = new Date();
+
+    if (period === 'day') {
+      const start = new Date(now); start.setHours(0,0,0,0);
+      url += `&created_at=gte.${start.toISOString()}`;
+    } else if (period === 'week') {
+      const start = new Date(now); start.setDate(now.getDate() - 7);
+      url += `&created_at=gte.${start.toISOString()}`;
+    } else if (period === 'month') {
+      const start = new Date(now); start.setDate(1); start.setHours(0,0,0,0);
+      url += `&created_at=gte.${start.toISOString()}`;
+    } else if (period === 'inventory' && currentInventory) {
+      url += `&inventory_id=eq.${currentInventory.id}`;
+    }
+
+    const data = await api(url);
+    return data || [];
+  }
+
+  async function exportExcel() {
+    const data = await getExportData();
+    if (!data.length) { alert('Žiadne dáta na export'); return; }
+
+    const rows = data.map(s => ({
+      'Značka': s.brand,
+      'Celkový objem (ml)': s.total_volume_ml,
+      'Zostatok (ml)': s.remaining_ml,
+      'Zostatok (%)': s.remaining_percent,
+      'Poznámka': s.notes || '',
+      'Dátum a čas': new Date(s.created_at).toLocaleString('sk-SK')
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [{ wch: 35 }, { wch: 18 }, { wch: 15 }, { wch: 13 }, { wch: 40 }, { wch: 20 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventúra');
+    XLSX.writeFile(wb, `PourAI_inventura_${new Date().toLocaleDateString('sk-SK').replace(/\./g,'-')}.xlsx`);
+  }
+
+  async function exportPDF() {
+    const data = await getExportData();
+    if (!data.length) { alert('Žiadne dáta na export'); return; }
+
+    const period = document.getElementById('exportPeriod').value;
+    const periodName = { day: 'Dnes', week: 'Tento týždeň', month: 'Tento mesiac', inventory: 'Inventúra' }[period];
+    const totalRemaining = data.reduce((s, r) => s + (r.remaining_ml || 0), 0);
+
+    const rows = data.map(s => `
+      <tr>
+        <td>${s.brand}</td>
+        <td style="text-align:center">${s.total_volume_ml} ml</td>
+        <td style="text-align:center">${s.remaining_ml} ml</td>
+        <td style="text-align:center">${s.remaining_percent}%</td>
+        <td style="color:#666">${s.notes || ''}</td>
+        <td style="text-align:center;color:#666">${new Date(s.created_at).toLocaleString('sk-SK')}</td>
+      </tr>`).join('');
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <style>
+      body { font-family: Arial, sans-serif; padding: 30px; color: #222; }
+      h1 { color: #6C63FF; margin-bottom: 4px; }
+      .meta { color: #666; font-size: 13px; margin-bottom: 20px; }
+      .summary { background: #f5f5f5; padding: 14px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 30px; }
+      .summary-item { display: flex; flex-direction: column; }
+      .summary-label { font-size: 11px; color: #888; text-transform: uppercase; }
+      .summary-value { font-size: 22px; font-weight: bold; color: #333; }
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th { background: #6C63FF; color: white; padding: 10px 12px; text-align: left; }
+      td { padding: 9px 12px; border-bottom: 1px solid #eee; }
+      tr:nth-child(even) td { background: #f9f9f9; }
+      @media print { body { padding: 10px; } }
+    </style></head><body>
+    <h1>🍾 PourAI — Inventúra</h1>
+    <div class="meta">Exportované: ${new Date().toLocaleString('sk-SK')} · Obdobie: ${periodName}</div>
+    <div class="summary">
+      <div class="summary-item"><span class="summary-label">Počet fľaší</span><span class="summary-value">${data.length}</span></div>
+      <div class="summary-item"><span class="summary-label">Celkový zostatok</span><span class="summary-value">${totalRemaining} ml</span></div>
+    </div>
+    <table>
+      <thead><tr><th>Značka</th><th>Objem</th><th>Zostatok</th><th>%</th><th>Poznámka</th><th>Dátum</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <script>window.onload=()=>{window.print()}<\/script>
+    </body></html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
   }
 </script>
 </body>
