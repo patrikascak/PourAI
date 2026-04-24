@@ -292,6 +292,10 @@
   document.getElementById('exportCard').style.display = 'block';
 }
 
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 function onInvTypeChange() {
   const type = document.getElementById('invType').value;
   const picker = document.getElementById('invPeriodPicker');
@@ -305,7 +309,7 @@ function onInvTypeChange() {
   if (type === 'day') {
     picker.style.display = 'block';
     picker.innerHTML = `<label>Dátum</label><input type="date" id="invDay" value="${now.toISOString().split('T')[0]}" />`;
-    nameInput.value = now.toLocaleDateString('sk-SK');
+    nameInput.value = capitalize(now.toLocaleDateString('sk-SK'));
   } else if (type === 'week') {
     const monday = new Date(now);
     monday.setDate(now.getDate() - now.getDay() + 1);
@@ -317,13 +321,14 @@ function onInvTypeChange() {
     picker.innerHTML = `<label>Mesiac</label><select id="invMonth">
       ${Array.from({length:12},(_,i)=>{
         const d = new Date(); d.setMonth(i);
-        return `<option value="${i}" ${i===now.getMonth()?'selected':''}>${d.toLocaleString('sk-SK',{month:'long'})}</option>`;
+        const name = capitalize(d.toLocaleString('sk-SK',{month:'long'}));
+        return `<option value="${i}" ${i===now.getMonth()?'selected':''}>${name}</option>`;
       }).join('')}
     </select>`;
-    nameInput.value = now.toLocaleString('sk-SK', {month:'long', year:'numeric'});
+    nameInput.value = capitalize(now.toLocaleString('sk-SK', {month:'long', year:'numeric'}));
     document.getElementById('invMonth').onchange = () => {
       const m = new Date(); m.setMonth(parseInt(document.getElementById('invMonth').value));
-      nameInput.value = m.toLocaleString('sk-SK', {month:'long', year:'numeric'});
+      nameInput.value = capitalize(m.toLocaleString('sk-SK', {month:'long', year:'numeric'}));
     };
   } else if (type === 'quarter') {
     const q = Math.floor(now.getMonth()/3)+1;
