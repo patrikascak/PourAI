@@ -361,14 +361,23 @@
   }
 
   async function startInventory() {
-    const name = document.getElementById('invName').value.trim();
-    await api('/rest/v1/inventories', 'POST', {
-      user_id: userId,
-      name: name || 'Inventúra',
-      status: 'open'
-    });
-    await checkActiveInventory();
+  const name = document.getElementById('invName').value.trim();
+  if (!name) { alert('Zadaj názov inventúry'); return; }
+  
+  // Skontroluj duplikát
+  const existing = await api(`/rest/v1/inventories?name=eq.${encodeURIComponent(name)}&status=eq.open`);
+  if (existing && existing.length > 0) {
+    alert(`Inventúra "${name}" už existuje a je aktívna!`);
+    return;
   }
+  
+  await api('/rest/v1/inventories', 'POST', {
+    user_id: userId,
+    name: name,
+    status: 'open'
+  });
+  await checkActiveInventory();
+}
 
   async function closeInventory() {
     if (!confirm('Naozaj chceš uzavrieť inventúru?')) return;
@@ -462,18 +471,38 @@
     document.getElementById('invName').value = `Q${q} ${new Date().getFullYear()}`;
   }
 
-  function handleFile(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      base64Data = e.target.result.split(',')[1];
-      document.getElementById('imageBox').innerHTML = `<img src="${e.target.result}" />`;
+  async function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    
+    // Konvertuj na JPEG cez canvas
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 1200;
+      let w = img.width, h = img.height;
+      if (w > MAX) { h = h * MAX / w; w = MAX; }
+      if (h > MAX) { w = w * MAX / h; h = MAX; }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const jpeg = canvas.toDataURL('image/jpeg', 0.85);
+      base64Data = jpeg.split(',')[1];
+      document.getElementById('imageBox').innerHTML = `<img src="${jpeg}" />`;
       document.getElementById('analyzeBtn').disabled = false;
       document.getElementById('output').innerHTML = '';
     };
-    reader.readAsDataURL(file);
-  }
+    img.onerror = () => {
+      document.getElementById('output').innerHTML = `<div class="error-box">❌ Tento formát fotky nie je podporovaný. Použi JPG, PNG alebo WebP.</div>`;
+    };
+    img.src = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
 
   function getColor(pct) {
     if (pct > 50) return '#4CAF50';
