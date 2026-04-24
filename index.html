@@ -648,7 +648,7 @@
             <div class="progress-track"><div class="progress-fill" style="width:${r.remainingPercent}%;background:${color}"></div></div>
             <span class="progress-pct" style="color:${color}">${r.remainingPercent}%</span>
           </div>
-          ${r.notes ? `<div class="notes">${r.notes}</div>` : ''}
+          ${r.ean ? `<div class="notes">EAN: ${r.ean}</div>` : ''}
         </div>`;
       if (!r.duplicate) await loadActiveScans();
     } catch (e) {
@@ -662,14 +662,13 @@
     if (!detailScans.length) { alert('Žiadne dáta'); return; }
     const rows = detailScans.map(s => ({
       'Značka': s.brand,
-      'Celkový objem (ml)': s.total_volume_ml,
       'Zostatok (ml)': s.remaining_ml,
       'Zostatok (%)': s.remaining_percent,
-      'Poznámka': s.notes || '',
+      'EAN': s.ean || '',
       'Dátum a čas': new Date(s.created_at).toLocaleString('sk-SK')
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
-    ws['!cols'] = [{wch:35},{wch:18},{wch:15},{wch:13},{wch:40},{wch:20}];
+    ws['!cols'] = [{wch:35},{wch:15},{wch:13},{wch:20},{wch:20}];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Inventúra');
     XLSX.writeFile(wb, `PourAI_${detailInventory.name.replace(/\s/g,'_')}.xlsx`);
@@ -677,13 +676,11 @@
 
   async function exportPDF() {
     if (!detailScans.length) { alert('Žiadne dáta'); return; }
-    const totalRemaining = detailScans.reduce((s,r) => s+(r.remaining_ml||0), 0);
     const rows = detailScans.map(s => `<tr>
       <td>${s.brand}</td>
-      <td style="text-align:center">${s.total_volume_ml}ml</td>
       <td style="text-align:center">${s.remaining_ml}ml</td>
       <td style="text-align:center">${s.remaining_percent}%</td>
-      <td style="color:#666">${s.notes||''}</td>
+      <td style="color:#666">${s.ean||''}</td>
       <td style="text-align:center;color:#666">${new Date(s.created_at).toLocaleString('sk-SK')}</td>
     </tr>`).join('');
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -691,10 +688,7 @@
       body{font-family:Arial,sans-serif;padding:30px;color:#222;}
       h1{color:#6C63FF;margin-bottom:4px;}
       .meta{color:#666;font-size:13px;margin-bottom:20px;}
-      .summary{background:#f5f5f5;padding:14px 20px;border-radius:8px;margin-bottom:20px;display:flex;gap:30px;}
-      .sl{display:flex;flex-direction:column;}
-      .sl span:first-child{font-size:11px;color:#888;text-transform:uppercase;}
-      .sl span:last-child{font-size:22px;font-weight:bold;}
+      .count{background:#f5f5f5;padding:10px 16px;border-radius:8px;margin-bottom:20px;font-size:14px;color:#444;}
       table{width:100%;border-collapse:collapse;font-size:13px;}
       th{background:#6C63FF;color:white;padding:10px 12px;text-align:left;}
       td{padding:9px 12px;border-bottom:1px solid #eee;}
@@ -702,11 +696,8 @@
     </style></head><body>
     <h1>🍾 PourAI — ${detailInventory.name}</h1>
     <div class="meta">Exportované: ${new Date().toLocaleString('sk-SK')}</div>
-    <div class="summary">
-      <div class="sl"><span>Počet fľaší</span><span>${detailScans.length}</span></div>
-      <div class="sl"><span>Celkový zostatok</span><span>${totalRemaining}ml</span></div>
-    </div>
-    <table><thead><tr><th>Značka</th><th>Objem</th><th>Zostatok</th><th>%</th><th>Poznámka</th><th>Dátum</th></tr></thead>
+    <div class="count">Počet fľaší: <strong>${detailScans.length}</strong></div>
+    <table><thead><tr><th>Značka</th><th>Zostatok</th><th>%</th><th>EAN</th><th>Dátum</th></tr></thead>
     <tbody>${rows}</tbody></table>
     <script>window.onload=()=>{window.print()}<\/script>
     </body></html>`;
