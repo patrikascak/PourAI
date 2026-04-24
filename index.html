@@ -196,7 +196,7 @@
     const data = await api('/auth/v1/token?grant_type=password', 'POST', { email, password }, false);
     if (data.error) { out.innerHTML = `<div class="error-box">❌ ${data.error_description || data.error}</div>`; return; }
     token = data.access_token;
-    showApp();
+    userId = data.user.id;    showApp();
     await loadInventory();
   }
 
@@ -268,9 +268,8 @@
 
   async function startInventory() {
   const name = document.getElementById('invName').value.trim();
-  const userData = await api('/auth/v1/user');
   const data = await api('/rest/v1/inventories', 'POST', {
-    user_id: userData.id,
+  user_id: userId,
     name: name || new Date().toLocaleDateString('sk-SK'),
     status: 'open'
   });
