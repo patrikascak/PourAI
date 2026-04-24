@@ -266,13 +266,15 @@
   }
 
   async function startInventory() {
-    const name = document.getElementById('invName').value.trim();
-    const data = await api('/rest/v1/inventories', 'POST', {
-      name: name || new Date().toLocaleDateString('sk-SK'),
-      status: 'open'
-    });
-    await loadInventory();
-  }
+  const name = document.getElementById('invName').value.trim();
+  const userData = await api('/auth/v1/user');
+  const data = await api('/rest/v1/inventories', 'POST', {
+    user_id: userData.id,
+    name: name || new Date().toLocaleDateString('sk-SK'),
+    status: 'open'
+  });
+  await loadInventory();
+}
 
   async function closeInventory() {
     if (!confirm('Naozaj chceš uzavrieť inventúru? Nebude možné pridávať ďalšie skeny.')) return;
