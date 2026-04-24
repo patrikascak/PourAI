@@ -246,16 +246,113 @@
   }
 
   function renderInventoryEmpty() {
-    document.getElementById('inventoryStatus').innerHTML = '<p style="color:#666680; font-size:14px;">Žiadna aktívna inventúra</p>';
-    document.getElementById('inventoryActions').innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div><label>Názov inventúry (voliteľné)</label><input type="text" id="invName" placeholder="napr. Streda večer" /></div>
-        <button class="btn-primary" onclick="startInventory()">▶️ Začať novú inventúru</button>
-      </div>`;
-    document.getElementById('scanCard').style.display = 'none';
-    document.getElementById('scansCard').style.display = 'none';
-    document.getElementById('exportCard').style.display = 'block';
+  document.getElementById('inventoryStatus').innerHTML = '<p style="color:#666680; font-size:14px;">Žiadna aktívna inventúra</p>';
+  document.getElementById('inventoryActions').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <label>Typ inventúry</label>
+        <select id="invType" onchange="onInvTypeChange()">
+          <option value="day">Denná</option>
+          <option value="week">Týždenná</option>
+          <option value="month" selected>Mesačná</option>
+          <option value="quarter">Štvrťročná</option>
+          <option value="year">Ročná</option>
+          <option value="custom">Vlastné obdobie</option>
+        </select>
+      </div>
+
+      <div id="invPeriodPicker">
+        <label>Mesiac</label>
+        <select id="invMonth">
+          ${Array.from({length:12},(_,i)=>{
+            const d = new Date(); d.setMonth(i);
+            return `<option value="${i}" ${i===new Date().getMonth()?'selected':''}>${d.toLocaleString('sk-SK',{month:'long'})}</option>`;
+          }).join('')}
+        </select>
+      </div>
+
+      <div id="invCustomPicker" style="display:none; gap:10px; flex-direction:column;">
+        <div class="btn-row">
+          <div style="flex:1;"><label>Od</label><input type="date" id="invDateFrom" /></div>
+          <div style="flex:1;"><label>Do</label><input type="date" id="invDateTo" /></div>
+        </div>
+      </div>
+
+      <div>
+        <label>Názov inventúry</label>
+        <input type="text" id="invName" placeholder="napr. Január 2025" />
+      </div>
+
+      <button class="btn-primary" onclick="startInventory()">▶️ Začať inventúru</button>
+    </div>`;
+
+  onInvTypeChange();
+  document.getElementById('scanCard').style.display = 'none';
+  document.getElementById('scansCard').style.display = 'none';
+  document.getElementById('exportCard').style.display = 'block';
+}
+
+function onInvTypeChange() {
+  const type = document.getElementById('invType').value;
+  const picker = document.getElementById('invPeriodPicker');
+  const custom = document.getElementById('invCustomPicker');
+  const nameInput = document.getElementById('invName');
+  const now = new Date();
+
+  picker.style.display = 'none';
+  custom.style.display = 'none';
+
+  if (type === 'day') {
+    picker.style.display = 'block';
+    picker.innerHTML = `<label>Dátum</label><input type="date" id="invDay" value="${now.toISOString().split('T')[0]}" />`;
+    nameInput.value = now.toLocaleDateString('sk-SK');
+  } else if (type === 'week') {
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - now.getDay() + 1);
+    picker.style.display = 'block';
+    picker.innerHTML = `<label>Začiatok týždňa</label><input type="date" id="invWeek" value="${monday.toISOString().split('T')[0]}" />`;
+    nameInput.value = `Týždeň od ${monday.toLocaleDateString('sk-SK')}`;
+  } else if (type === 'month') {
+    picker.style.display = 'block';
+    picker.innerHTML = `<label>Mesiac</label><select id="invMonth">
+      ${Array.from({length:12},(_,i)=>{
+        const d = new Date(); d.setMonth(i);
+        return `<option value="${i}" ${i===now.getMonth()?'selected':''}>${d.toLocaleString('sk-SK',{month:'long'})}</option>`;
+      }).join('')}
+    </select>`;
+    nameInput.value = now.toLocaleString('sk-SK', {month:'long', year:'numeric'});
+    document.getElementById('invMonth').onchange = () => {
+      const m = new Date(); m.setMonth(parseInt(document.getElementById('invMonth').value));
+      nameInput.value = m.toLocaleString('sk-SK', {month:'long', year:'numeric'});
+    };
+  } else if (type === 'quarter') {
+    const q = Math.floor(now.getMonth()/3)+1;
+    picker.style.display = 'block';
+    picker.innerHTML = `<label>Štvrťrok</label><select id="invQuarter">
+      <option value="1" ${q===1?'selected':''}>Q1 (Jan–Mar)</option>
+      <option value="2" ${q===2?'selected':''}>Q2 (Apr–Jún)</option>
+      <option value="3" ${q===3?'selected':''}>Q3 (Júl–Sep)</option>
+      <option value="4" ${q===4?'selected':''}>Q4 (Okt–Dec)</option>
+    </select>`;
+    nameInput.value = `Q${q} ${now.getFullYear()}`;
+    document.getElementById('invQuarter').onchange = () => {
+      nameInput.value = `Q${document.getElementById('invQuarter').value} ${now.getFullYear()}`;
+    };
+  } else if (type === 'year') {
+    picker.style.display = 'block';
+    picker.innerHTML = `<label>Rok</label><input type="number" id="invYear" value="${now.getFullYear()}" min="2020" max="2030" style="background:#0F0F1A;border:1px solid #2A2A3E;border-radius:8px;color:#fff;font-size:15px;padding:12px;width:100%;" />`;
+    nameInput.value = `${now.getFullYear()}`;
+    document.getElementById('invYear').onchange = () => {
+      nameInput.value = document.getElementById('invYear').value;
+    };
+  } else if (type === 'custom') {
+    custom.style.display = 'flex';
+    const from = now.toISOString().split('T')[0];
+    document.getElementById('invDateFrom').value = from;
+    document.getElementById('invDateTo').value = from;
+    nameInput.value = `Vlastné obdobie`;
   }
+}
 
   function renderInventoryOpen() {
     const date = new Date(currentInventory.created_at).toLocaleDateString('sk-SK');
