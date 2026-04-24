@@ -279,10 +279,13 @@
     userId = data.user.id;
     // Skontroluj admin
     const userData = await api(`/rest/v1/users?id=eq.${userId}&select=is_admin,scans_this_month`);
+    console.log('userId:', userId);
     console.log('userData:', JSON.stringify(userData));
-    if (userData && userData[0]?.is_admin) {
-      document.getElementById('adminBtn').style.display = 'block';
-}
+    const isAdmin = userData && Array.isArray(userData) && userData.length > 0 && userData[0].is_admin === true;
+    console.log('isAdmin:', isAdmin);
+    if (isAdmin) {
+      document.getElementById('adminBtn').style.display = 'inline-flex';
+    }
     if (userData && userData[0]) {
       document.getElementById('scanCounter').textContent = userData[0].scans_this_month + ' / 150';
     }
