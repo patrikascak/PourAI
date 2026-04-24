@@ -540,7 +540,8 @@ async function continueInventory(invId) {
       if (r.error) throw new Error(r.error);
       const color = getColor(r.remainingPercent);
       document.getElementById('scanCounter').textContent = r.scansUsed + ' / 150';
-      document.getElementById('output').innerHTML = `
+      const dupMsg = r.duplicate ? `<div class="success-box" style="background:#2A2A1A;border-color:#5A5A2A;color:#FFD700;">⚠️ Táto fotka už bola analyzovaná — zobrazujeme uložený výsledok.</div>` : '';
+      document.getElementById('output').innerHTML = dupMsg + `
         <div class="result-card">
           <div class="brand">${r.brand}</div>
           <div class="vol-row">
