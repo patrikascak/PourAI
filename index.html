@@ -161,7 +161,7 @@
   <!-- AKTÍVNA INVENTÚRA -->
   <div id="activeScreen" class="container" style="display:none;">
     <div class="card">
-      <button class="btn-back" onclick="goHome()">← Späť</button>
+      <button class="btn-back" onclick="goHome(true)">← Späť</button>
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <div>
           <div style="font-size:13px;color:#666680;margin-bottom:4px;">Aktívna inventúra</div>
@@ -195,7 +195,7 @@
   <!-- DETAIL INVENTÚRY -->
   <div id="detailScreen" class="container" style="display:none;">
     <div class="card">
-      <button class="btn-back" onclick="goHome()">← Späť</button>
+      <button class="btn-back" onclick="goHome(true)">← Späť</button>
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div>
           <div style="font-size:13px;color:#666680;margin-bottom:4px;">Inventúra</div>
@@ -256,7 +256,7 @@
     userId = data.user.id;
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appScreen').style.display = 'block';
-    goHome();
+    goHome(true);
   }
 
   async function register() {
@@ -284,12 +284,14 @@
     document.getElementById(name).style.flexDirection = 'column';
   }
 
-  async function goHome() {
-    showScreen('homeScreen');
-    onInvTypeChange();
-    await loadHistory();
+  async function goHome(skipActiveCheck = false) {
+  showScreen('homeScreen');
+  onInvTypeChange();
+  await loadHistory();
+  if (!skipActiveCheck) {
     await checkActiveInventory();
   }
+}
 
   function showTab(tab) {
     ['tabNew','tabHistory'].forEach(t => { document.getElementById(t).style.display = 'none'; });
@@ -375,7 +377,7 @@
       closed_at: new Date().toISOString()
     });
     currentInventory = null;
-    goHome();
+    goHome(true);
   }
 
   async function loadActiveScans() {
