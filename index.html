@@ -182,10 +182,11 @@
   let currentScans = [];
 
   async function api(path, method = 'GET', body = null, auth = true) {
-    const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY };
+    const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Prefer': 'return=representation' };
     if (auth) headers['Authorization'] = 'Bearer ' + token;
     const res = await fetch(SUPABASE_URL + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
-    return res.json();
+    if (res.status === 204 || res.headers.get('content-length') === '0') return {};
+    try { return await res.json(); } catch { return {}; }
   }
 
   async function login() {
