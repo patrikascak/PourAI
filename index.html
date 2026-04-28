@@ -90,20 +90,20 @@
 <div id="loginScreen">
   <div class="container" style="width:100%;">
     <div class="card" style="margin-top:40px;">
-      <div style="text-align:center; font-size:44px;"></div>
+      <div style="text-align:center; font-size:44px;">🍾</div>
       <h2 style="text-align:center;">PourAI</h2>
-      <p style="text-align:center; color:#9090B0; font-size:14px;">Invent'fara alkoholu pre bary</p>
+      <p style="text-align:center; color:#9090B0; font-size:14px;">Inventúra alkoholu pre bary</p>
       <div id="loginForm" style="display:flex;flex-direction:column;gap:14px;">
         <div><label>Email</label><input type="email" id="loginEmail" placeholder="bar@example.com" /></div>
-        <div><label>Heslo</label><input type="password" id="loginPassword" placeholder="'95'95'95'95'95'95'95'95" /></div>
-        <button class="btn-primary" onclick="login()">Prihl'e1si sa</button>
-        <div class="toggle-link" onclick="showRegister()">Nem'e1'9a 'faet? <span>Zaregistruj sa</span></div>
+        <div><label>Heslo</label><input type="password" id="loginPassword" placeholder="••••••••" /></div>
+        <button class="btn-primary" onclick="login()">Prihlásiť sa</button>
+        <div class="toggle-link" onclick="showRegister()">Nemáš účet? <span>Zaregistruj sa</span></div>
       </div>
       <div id="registerForm" style="display:none;flex-direction:column;gap:14px;">
         <div><label>Email</label><input type="email" id="regEmail" placeholder="bar@example.com" /></div>
         <div><label>Heslo</label><input type="password" id="regPassword" placeholder="min. 6 znakov" /></div>
-        <button class="btn-primary" onclick="register()">Vytvori 'faet</button>
-        <div class="toggle-link" onclick="showLogin()">M'e1'9a 'faet? <span>Prihl'e1s sa</span></div>
+        <button class="btn-primary" onclick="register()">Vytvoriť účet</button>
+        <div class="toggle-link" onclick="showLogin()">Máš účet? <span>Prihlás sa</span></div>
       </div>
       <div id="authOutput"></div>
     </div>
@@ -113,31 +113,31 @@
 <!-- APP -->
 <div id="appScreen">
   <header>
-    <div class="header-left"><span></span><h1>PourAI</h1></div>
+    <div class="header-left"><span>🍾</span><h1>PourAI</h1></div>
     <div style="display:flex;align-items:center;gap:8px;">
       <span class="scan-counter" id="scanCounter">0 / 150</span>
-      <button id="adminBtn" class="btn-logout" onclick="showAdmin()" style="display:none;"></button>
-      <button class="btn-logout" onclick="logout()">Odhl'e1si</button>
+      <button id="adminBtn" class="btn-logout" onclick="showAdmin()" style="display:none;">🔧</button>
+      <button class="btn-logout" onclick="logout()">Odhlásiť</button>
     </div>
   </header>
 
   <!-- HOME -->
   <div id="homeScreen" class="container" style="display:none;">
     <div class="nav-tabs">
-      <button class="nav-tab active" onclick="showTab('tabNew')"> Nov'e1 invent'fara</button>
-      <button class="nav-tab" onclick="showTab('tabHistory')"> Hist'f3ria</button>
+      <button class="nav-tab active" onclick="showTab('tabNew')">➕ Nová inventúra</button>
+      <button class="nav-tab" onclick="showTab('tabHistory')">📋 História</button>
     </div>
 
     <div id="tabNew" class="card">
-      <h2>Nov'e1 invent'fara</h2>
-      <div><label>Typ invent'fary</label>
+      <h2>Nová inventúra</h2>
+      <div><label>Typ inventúry</label>
         <select id="invType" onchange="onInvTypeChange()">
-          <option value="day">Denn'e1</option>
-          <option value="week">T'fd'9edenn'e1</option>
-          <option value="month" selected>Mesan'e1</option>
-          <option value="quarter">'8atvrron'e1</option>
-          <option value="year">Ron'e1</option>
-          <option value="custom">Vlastn'e9 obdobie</option>
+          <option value="day">Denná</option>
+          <option value="week">Týždenná</option>
+          <option value="month" selected>Mesačná</option>
+          <option value="quarter">Štvrťročná</option>
+          <option value="year">Ročná</option>
+          <option value="custom">Vlastné obdobie</option>
         </select>
       </div>
       <div id="invPeriodPicker"></div>
@@ -147,57 +147,57 @@
           <div style="flex:1;"><label>Do</label><input type="date" id="invDateTo" /></div>
         </div>
       </div>
-      <div><label>N'e1zov invent'fary</label><input type="text" id="invName" /></div>
-      <button class="btn-primary" onclick="startInventory()"> Zaa invent'faru</button>
+      <div><label>Názov inventúry</label><input type="text" id="invName" /></div>
+      <button class="btn-primary" onclick="startInventory()">▶️ Začať inventúru</button>
     </div>
 
     <div id="tabHistory" style="display:none;" class="card">
-      <h2>Hist'f3ria invent'far</h2>
+      <h2>História inventúr</h2>
       <div class="inv-list" id="invList"><div class="loading"><div class="spinner"></div></div></div>
     </div>
   </div>
 
-  <!-- AKT'cdVNA INVENT'daRA -->
+  <!-- AKTÍVNA INVENTÚRA -->
   <div id="activeScreen" class="container" style="display:none;">
     <div class="card">
-      <button class="btn-back" onclick="goHome(true)"> Sp'e4</button>
+      <button class="btn-back" onclick="goHome(true)">← Späť</button>
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <div>
-          <div style="font-size:13px;color:#666680;margin-bottom:4px;">Akt'edvna invent'fara</div>
+          <div style="font-size:13px;color:#666680;margin-bottom:4px;">Aktívna inventúra</div>
           <div style="font-size:18px;font-weight:700;" id="activeInvName"></div>
         </div>
-        <div class="inventory-badge"> Akt'edvna</div>
+        <div class="inventory-badge">🟢 Aktívna</div>
       </div>
-      <button class="btn-danger" onclick="closeInventory()"> Uzavrie invent'faru</button>
+      <button class="btn-danger" onclick="closeInventory()">🔒 Uzavrieť inventúru</button>
     </div>
 
     <div class="card">
       <div class="image-box" id="imageBox">
-        <div class="placeholder"><span class="icon"></span><p>Odfotte alebo vyberte fa'9au</p></div>
+        <div class="placeholder"><span class="icon">🍾</span><p>Odfotte alebo vyberte fľašu</p></div>
       </div>
       <div class="btn-row">
-        <button class="btn-secondary" onclick="document.getElementById('cameraInput').click()"> Fotoapar'e1t</button>
-        <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()"> Gal'e9ria</button>
+        <button class="btn-secondary" onclick="document.getElementById('cameraInput').click()">📷 Fotoaparát</button>
+        <button class="btn-secondary" onclick="document.getElementById('galleryInput').click()">🖼️ Galéria</button>
       </div>
       <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleFile(this)" />
       <input type="file" id="galleryInput" accept="image/*" onchange="handleFile(this)" />
-      <button class="btn-analyze" id="analyzeBtn" disabled onclick="analyze()"> Analyzova fa'9au</button>
+      <button class="btn-analyze" id="analyzeBtn" disabled onclick="analyze()">🔍 Analyzovať fľašu</button>
       <div id="output"></div>
     </div>
 
     <div class="card" id="activeScansCard" style="display:none;">
-      <h2> Naskenovan'e9 fa'9ae</h2>
+      <h2>📦 Naskenované fľaše</h2>
       <div class="scans-list" id="activeScansList"></div>
     </div>
   </div>
 
-  <!-- DETAIL INVENT'daRY -->
+  <!-- DETAIL INVENTÚRY -->
   <div id="detailScreen" class="container" style="display:none;">
     <div class="card">
-      <button class="btn-back" onclick="goHome(true)"> Sp'e4</button>
+      <button class="btn-back" onclick="goHome(true)">← Späť</button>
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div>
-          <div style="font-size:13px;color:#666680;margin-bottom:4px;">Invent'fara</div>
+          <div style="font-size:13px;color:#666680;margin-bottom:4px;">Inventúra</div>
           <div style="font-size:18px;font-weight:700;" id="detailInvName"></div>
           <div style="font-size:12px;color:#666680;margin-top:4px;" id="detailInvMeta"></div>
         </div>
@@ -205,15 +205,15 @@
       </div>
     </div>
     <div class="card">
-      <h2> Export</h2>
+      <h2>📊 Export</h2>
       <div class="export-row">
-        <button class="btn-secondary" onclick="exportExcel()"> Excel</button>
-        <button class="btn-secondary" onclick="exportPDF()"> PDF</button>
+        <button class="btn-secondary" onclick="exportExcel()">📗 Excel</button>
+        <button class="btn-secondary" onclick="exportPDF()">📄 PDF</button>
       </div>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <h2> Fa'9ae</h2>
+        <h2>📦 Fľaše</h2>
         <div style="font-size:13px;color:#666680;" id="detailCount"></div>
       </div>
       <div class="scans-list" id="detailScansList"></div>
@@ -223,25 +223,25 @@
   <!-- ADMIN -->
   <div id="adminScreen" class="container" style="display:none;">
     <div class="card">
-      <button class="btn-back" onclick="goHome(true)"> Sp'e4</button>
-      <h2> Admin panel</h2>
+      <button class="btn-back" onclick="goHome(true)">← Späť</button>
+      <h2>🔧 Admin panel</h2>
     </div>
 
     <div class="card">
-      <h2> U'9e'edvatelia</h2>
+      <h2>👥 Užívatelia</h2>
       <div class="inv-list" id="adminUsersList"><div class="loading"><div class="spinner"></div></div></div>
     </div>
 
     <div class="card">
-      <h2> V'9aetky invent'fary</h2>
+      <h2>📋 Všetky inventúry</h2>
       <div class="inv-list" id="adminInvList"><div class="loading"><div class="spinner"></div></div></div>
     </div>
 
     <div class="card">
-      <h2> Vymaza sken</h2>
-      <p style="color:#666680;font-size:14px;">Zadaj ID skenu ktor'fd chce'9a vymaza</p>
+      <h2>🗑️ Vymazať sken</h2>
+      <p style="color:#666680;font-size:14px;">Zadaj ID skenu ktorý chceš vymazať</p>
       <input type="text" id="deleteScanId" placeholder="ID skenu" />
-      <button class="btn-danger" onclick="deleteScan()"> Vymaza sken</button>
+      <button class="btn-danger" onclick="deleteScan()">🗑️ Vymazať sken</button>
     </div>
   </div>
 
@@ -274,7 +274,7 @@
     const out = document.getElementById('authOutput');
     out.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     const data = await api('/auth/v1/token?grant_type=password', 'POST', { email, password }, false);
-    if (data.error) { out.innerHTML = `<div class="error-box"> ${data.error_description || data.error}</div>`; return; }
+    if (data.error) { out.innerHTML = `<div class="error-box">❌ ${data.error_description || data.error}</div>`; return; }
     token = data.access_token;
     userId = data.user.id;
     // Skontroluj admin
@@ -300,8 +300,8 @@
     const out = document.getElementById('authOutput');
     out.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     const data = await api('/auth/v1/signup', 'POST', { email, password }, false);
-    if (data.error) { out.innerHTML = `<div class="error-box"> ${data.error_description || data.error}</div>`; return; }
-    out.innerHTML = `<div class="success-box"> 'daet vytvoren'fd! Skontroluj email.</div>`;
+    if (data.error) { out.innerHTML = `<div class="error-box">❌ ${data.error_description || data.error}</div>`; return; }
+    out.innerHTML = `<div class="success-box">✅ Účet vytvorený! Skontroluj email.</div>`;
   }
 
   function logout() {
@@ -350,11 +350,11 @@
   async function loadHistory() {
     const data = await api('/rest/v1/inventories?order=created_at.desc&select=*');
     const list = document.getElementById('invList');
-    if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">'8eiadne invent'fary</p>'; return; }
+    if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadne inventúry</p>'; return; }
     list.innerHTML = data.map(inv => {
       const date = new Date(inv.created_at).toLocaleDateString('sk-SK');
-      const badge = inv.status === 'open' ? '<span class="badge-open">Akt'edvna</span>' : '<span class="badge-closed">Uzavret'e1</span>';
-      const continueBtn = inv.status === 'open' ? `<button onclick="continueInventory('${inv.id}')" style="background:#1A2A1A;border:1px solid #2A5A2A;color:#4CAF50;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;width:auto;"> Pokraova</button>` : '';
+      const badge = inv.status === 'open' ? '<span class="badge-open">Aktívna</span>' : '<span class="badge-closed">Uzavretá</span>';
+      const continueBtn = inv.status === 'open' ? `<button onclick="continueInventory('${inv.id}')" style="background:#1A2A1A;border:1px solid #2A5A2A;color:#4CAF50;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;width:auto;">▶️ Pokračovať</button>` : '';
       return `<div class="inv-item">
         <div class="inv-item-left" onclick="openDetail('${inv.id}')" style="flex:1;cursor:pointer;">
           <div class="inv-item-name">${inv.name}</div>
@@ -363,7 +363,7 @@
         <div class="inv-item-right" style="gap:6px;">
           ${badge}
           ${continueBtn}
-          <span onclick="openDetail('${inv.id}')" style="font-size:20px;color:#666680;cursor:pointer;">'9b</span>
+          <span onclick="openDetail('${inv.id}')" style="font-size:20px;color:#666680;cursor:pointer;">›</span>
         </div>
       </div>`;
     }).join('');
@@ -385,11 +385,11 @@
     document.getElementById('detailInvName').textContent = detailInventory.name;
     const created = new Date(detailInventory.created_at).toLocaleDateString('sk-SK');
     const closed = detailInventory.closed_at ? new Date(detailInventory.closed_at).toLocaleDateString('sk-SK') : null;
-    document.getElementById('detailInvMeta').textContent = closed ? `${created} '97 ${closed}` : `Vytvoren'e1: ${created}`;
-    document.getElementById('detailBadge').innerHTML = detailInventory.status === 'open' ? '<span class="badge-open">Akt'edvna</span>' : '<span class="badge-closed">Uzavret'e1</span>';
-    document.getElementById('detailCount').textContent = `${detailScans.length} fa'9a'ed`;
+    document.getElementById('detailInvMeta').textContent = closed ? `${created} — ${closed}` : `Vytvorená: ${created}`;
+    document.getElementById('detailBadge').innerHTML = detailInventory.status === 'open' ? '<span class="badge-open">Aktívna</span>' : '<span class="badge-closed">Uzavretá</span>';
+    document.getElementById('detailCount').textContent = `${detailScans.length} fľaší`;
     const list = document.getElementById('detailScansList');
-    if (detailScans.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">'8eiadne skeny</p>'; }
+    if (detailScans.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadne skeny</p>'; }
     else {
       list.innerHTML = detailScans.map(s => {
         const color = s.remaining_percent > 50 ? '#4CAF50' : s.remaining_percent > 20 ? '#FF9800' : '#F44336';
@@ -397,7 +397,7 @@
         return `<div class="scan-item">
           <div class="scan-item-left">
             <div class="scan-item-brand">${s.brand}</div>
-            <div class="scan-item-time">${time} 'b7 ${s.total_volume_ml}ml celkom</div>
+            <div class="scan-item-time">${time} · ${s.total_volume_ml}ml celkom</div>
           </div>
           <div class="scan-item-right">
             <div class="scan-item-ml" style="color:${color}">${s.remaining_ml}ml</div>
@@ -411,15 +411,15 @@
 
   async function startInventory() {
     const name = document.getElementById('invName').value.trim();
-    if (!name) { alert('Zadaj n'e1zov invent'fary'); return; }
+    if (!name) { alert('Zadaj názov inventúry'); return; }
     const existing = await api(`/rest/v1/inventories?name=eq.${encodeURIComponent(name)}&status=eq.open`);
-    if (existing && existing.length > 0) { alert(`Invent'fara "${name}" u'9e existuje a je akt'edvna!`); return; }
+    if (existing && existing.length > 0) { alert(`Inventúra "${name}" už existuje a je aktívna!`); return; }
     await api('/rest/v1/inventories', 'POST', { user_id: userId, name: name, status: 'open' });
     await checkActiveInventory();
   }
 
   async function closeInventory() {
-    if (!confirm('Naozaj chce'9a uzavrie invent'faru?')) return;
+    if (!confirm('Naozaj chceš uzavrieť inventúru?')) return;
     await api(`/rest/v1/inventories?id=eq.${currentInventory.id}`, 'PATCH', { status: 'closed', closed_at: new Date().toISOString() });
     currentInventory = null;
     goHome(true);
@@ -437,7 +437,7 @@
         return `<div class="scan-item">
           <div class="scan-item-left">
             <div class="scan-item-brand">${s.brand}</div>
-            <div class="scan-item-time">${time} 'b7 ${s.total_volume_ml}ml celkom</div>
+            <div class="scan-item-time">${time} · ${s.total_volume_ml}ml celkom</div>
           </div>
           <div class="scan-item-right">
             <div class="scan-item-ml" style="color:${color}">${s.remaining_ml}ml</div>
@@ -458,16 +458,16 @@
   async function loadAdminUsers() {
     const data = await api('/rest/v1/users?select=*&order=created_at.desc');
     const list = document.getElementById('adminUsersList');
-    if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">'8eiadni u'9e'edvatelia</p>'; return; }
+    if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadni užívatelia</p>'; return; }
     list.innerHTML = data.map(u => `
       <div class="inv-item" style="flex-wrap:wrap;gap:10px;">
         <div class="inv-item-left" style="flex:1;">
           <div class="inv-item-name" style="font-size:13px;">${u.email}</div>
-          <div class="inv-item-meta">Skeny: ${u.scans_this_month}/150 'b7 ${u.is_active ? ' Akt'edvny' : ' Neakt'edvny'}</div>
+          <div class="inv-item-meta">Skeny: ${u.scans_this_month}/150 · ${u.is_active ? '🟢 Aktívny' : '🔴 Neaktívny'}</div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button onclick="toggleUser('${u.id}', ${u.is_active})" class="admin-btn-sm" style="color:${u.is_active ? '#FF6B6B' : '#4CAF50'};">
-            ${u.is_active ? 'Deaktivova' : 'Aktivova'}
+            ${u.is_active ? 'Deaktivovať' : 'Aktivovať'}
           </button>
           <button onclick="resetScans('${u.id}')" class="admin-btn-sm">Reset skenov</button>
         </div>
@@ -480,7 +480,7 @@
   }
 
   async function resetScans(id) {
-    if (!confirm('Naozaj resetova poet skenov?')) return;
+    if (!confirm('Naozaj resetovať počet skenov?')) return;
     await api(`/rest/v1/users?id=eq.${id}`, 'PATCH', { scans_this_month: 0 });
     await loadAdminUsers();
   }
@@ -488,16 +488,16 @@
   async function loadAdminInventories() {
     const data = await api('/rest/v1/inventories?select=*&order=created_at.desc');
     const list = document.getElementById('adminInvList');
-    if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">'8eiadne invent'fary</p>'; return; }
+    if (!data || data.length === 0) { list.innerHTML = '<p style="color:#666680;font-size:14px;">Žiadne inventúry</p>'; return; }
     list.innerHTML = data.map(inv => `
       <div class="inv-item" style="flex-wrap:wrap;gap:10px;">
         <div class="inv-item-left" style="flex:1;">
           <div class="inv-item-name">${inv.name}</div>
-          <div class="inv-item-meta">${new Date(inv.created_at).toLocaleDateString('sk-SK')} 'b7 ${inv.status === 'open' ? ' Akt'edvna' : ' Uzavret'e1'}</div>
+          <div class="inv-item-meta">${new Date(inv.created_at).toLocaleDateString('sk-SK')} · ${inv.status === 'open' ? '🟢 Aktívna' : '🔴 Uzavretá'}</div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          ${inv.status === 'closed' ? `<button onclick="reopenInventory('${inv.id}')" class="admin-btn-sm" style="color:#63B3FF;">Otvori</button>` : ''}
-          <button onclick="adminDeleteInventory('${inv.id}')" class="admin-btn-sm" style="color:#FF6B6B;">Vymaza</button>
+          ${inv.status === 'closed' ? `<button onclick="reopenInventory('${inv.id}')" class="admin-btn-sm" style="color:#63B3FF;">Otvoriť</button>` : ''}
+          <button onclick="adminDeleteInventory('${inv.id}')" class="admin-btn-sm" style="color:#FF6B6B;">Vymazať</button>
         </div>
       </div>`).join('');
   }
@@ -508,7 +508,7 @@
   }
 
   async function adminDeleteInventory(id) {
-    if (!confirm('Vymaza cel'fa invent'faru aj so v'9aetk'fdmi skenmi?')) return;
+    if (!confirm('Vymazať celú inventúru aj so všetkými skenmi?')) return;
     await api(`/rest/v1/scans?inventory_id=eq.${id}`, 'DELETE');
     await api(`/rest/v1/inventories?id=eq.${id}`, 'DELETE');
     await loadAdminInventories();
@@ -517,10 +517,10 @@
   async function deleteScan() {
     const id = document.getElementById('deleteScanId').value.trim();
     if (!id) { alert('Zadaj ID skenu'); return; }
-    if (!confirm('Naozaj vymaza tento sken?')) return;
+    if (!confirm('Naozaj vymazať tento sken?')) return;
     await api(`/rest/v1/scans?id=eq.${id}`, 'DELETE');
     document.getElementById('deleteScanId').value = '';
-    alert('Sken vymazan'fd!');
+    alert('Sken vymazaný!');
   }
 
   function onInvTypeChange() {
@@ -535,13 +535,13 @@
 
     if (type === 'day') {
       picker.style.display = 'block';
-      picker.innerHTML = `<label>D'e1tum</label><input type="date" id="invDay" value="${now.toISOString().split('T')[0]}" onchange="document.getElementById('invName').value=new Date(this.value).toLocaleDateString('sk-SK')" />`;
+      picker.innerHTML = `<label>Dátum</label><input type="date" id="invDay" value="${now.toISOString().split('T')[0]}" onchange="document.getElementById('invName').value=new Date(this.value).toLocaleDateString('sk-SK')" />`;
       nameInput.value = now.toLocaleDateString('sk-SK');
     } else if (type === 'week') {
       const monday = new Date(now); monday.setDate(now.getDate() - now.getDay() + 1);
       picker.style.display = 'block';
-      picker.innerHTML = `<label>Zaiatok t'fd'9eda</label><input type="date" id="invWeek" value="${monday.toISOString().split('T')[0]}" onchange="document.getElementById('invName').value='T'fd'9ede od '+new Date(this.value).toLocaleDateString('sk-SK')" />`;
-      nameInput.value = `T'fd'9ede od ${monday.toLocaleDateString('sk-SK')}`;
+      picker.innerHTML = `<label>Začiatok týždňa</label><input type="date" id="invWeek" value="${monday.toISOString().split('T')[0]}" onchange="document.getElementById('invName').value='Týždeň od '+new Date(this.value).toLocaleDateString('sk-SK')" />`;
+      nameInput.value = `Týždeň od ${monday.toLocaleDateString('sk-SK')}`;
     } else if (type === 'month') {
       picker.style.display = 'block';
       picker.innerHTML = `<label>Mesiac</label><select id="invMonth" onchange="updateMonthName()">
@@ -551,11 +551,11 @@
     } else if (type === 'quarter') {
       const q = Math.floor(now.getMonth()/3)+1;
       picker.style.display = 'block';
-      picker.innerHTML = `<label>'8atvrrok</label><select id="invQuarter" onchange="updateQuarterName()">
-        <option value="1" ${q===1?'selected':''}>Q1 (Jan'96Mar)</option>
-        <option value="2" ${q===2?'selected':''}>Q2 (Apr'96J'fan)</option>
-        <option value="3" ${q===3?'selected':''}>Q3 (J'fal'96Sep)</option>
-        <option value="4" ${q===4?'selected':''}>Q4 (Okt'96Dec)</option>
+      picker.innerHTML = `<label>Štvrťrok</label><select id="invQuarter" onchange="updateQuarterName()">
+        <option value="1" ${q===1?'selected':''}>Q1 (Jan–Mar)</option>
+        <option value="2" ${q===2?'selected':''}>Q2 (Apr–Jún)</option>
+        <option value="3" ${q===3?'selected':''}>Q3 (Júl–Sep)</option>
+        <option value="4" ${q===4?'selected':''}>Q4 (Okt–Dec)</option>
       </select>`;
       nameInput.value = `Q${q} ${now.getFullYear()}`;
     } else if (type === 'year') {
@@ -567,7 +567,7 @@
       const from = now.toISOString().split('T')[0];
       document.getElementById('invDateFrom').value = from;
       document.getElementById('invDateTo').value = from;
-      nameInput.value = 'Vlastn'e9 obdobie';
+      nameInput.value = 'Vlastné obdobie';
     }
   }
 
@@ -603,87 +603,73 @@
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
 
-        // Zobraz farebnú fotku v UI
+        // Farebná fotka pre UI
         const colorJpeg = canvas.toDataURL('image/jpeg', 0.85);
         document.getElementById('imageBox').innerHTML = `<img src="${colorJpeg}" />`;
 
-        // PIXEL ANALÝZA podľa článku (Gaussian blur + threshold + bounding box)
+        // PIXEL ANALÝZA - grayscale + blur + threshold + bounding box
         const imageData = ctx.getImageData(0, 0, w, h);
-        const d = imageData.data;
+        const px = imageData.data;
 
-        // 1. Konvertuj na grayscale
-        const gray = new Uint8Array(w * h);
+        // 1. Grayscale
+        const grayArr = new Uint8Array(w * h);
         for (let i = 0; i < w * h; i++) {
-          gray[i] = Math.round(0.299 * d[i*4] + 0.587 * d[i*4+1] + 0.114 * d[i*4+2]);
+          grayArr[i] = Math.round(0.299 * px[i*4] + 0.587 * px[i*4+1] + 0.114 * px[i*4+2]);
         }
 
-        // 2. Gaussian blur 7x7 (zjednodušený box blur)
+        // 2. Box blur 7x7
         const blurred = new Uint8Array(w * h);
-        const r = 3;
+        const br = 3;
         for (let y = 0; y < h; y++) {
           for (let x = 0; x < w; x++) {
-            let sum = 0, count = 0;
-            for (let dy = -r; dy <= r; dy++) {
-              for (let dx = -r; dx <= r; dx++) {
-                const nx = x + dx, ny = y + dy;
-                if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                  sum += gray[ny * w + nx]; count++;
-                }
+            let sum = 0, cnt = 0;
+            for (let dy = -br; dy <= br; dy++) {
+              for (let dx = -br; dx <= br; dx++) {
+                const nx = x+dx, ny = y+dy;
+                if (nx>=0 && nx<w && ny>=0 && ny<h) { sum += grayArr[ny*w+nx]; cnt++; }
               }
             }
-            blurred[y * w + x] = sum / count;
+            blurred[y*w+x] = sum/cnt;
           }
         }
 
-        // 3. Threshold - nájdi tmavé pixely (tekutina)
-        // Automatický threshold: stredná hodnota histogramu
-        let hist = new Array(256).fill(0);
+        // 3. Auto threshold - spodnych 25% najtemnejsich pixelov = tekutina
+        const hist = new Array(256).fill(0);
         for (let i = 0; i < blurred.length; i++) hist[blurred[i]]++;
-        let total = 0, threshold = 80;
+        let cumul = 0, autoThresh = 80;
         for (let i = 0; i < 256; i++) {
-          total += hist[i];
-          if (total > blurred.length * 0.25) { threshold = i; break; }
+          cumul += hist[i];
+          if (cumul > blurred.length * 0.25) { autoThresh = i; break; }
         }
 
-        // 4. Nájdi bounding box tmavej oblasti (tekutina)
-        let minY = h, maxY = 0, minX = w, maxX = 0;
-        let darkPixels = 0;
+        // 4. Bounding box tmavej oblasti (strednych 60% sirky - ignoruj okraje)
+        let minY = h, maxY = 0, darkCount = 0;
         for (let y = 0; y < h; y++) {
-          for (let x = 0; x < w; x++) {
-            if (blurred[y * w + x] < threshold) {
-              darkPixels++;
+          for (let x = Math.floor(w*0.2); x < Math.floor(w*0.8); x++) {
+            if (blurred[y*w+x] < autoThresh) {
+              darkCount++;
               if (y < minY) minY = y;
               if (y > maxY) maxY = y;
-              if (x < minX) minX = x;
-              if (x > maxX) maxX = x;
             }
           }
         }
 
-        // 5. Vypočítaj aspect ratio a odhadni fill %
-        const liquidH = maxY - minY;
-        const liquidW = maxX - minX;
-        const aspectRatio = liquidW > 0 ? liquidW / liquidH : 0;
-        // Liquid surface Y position ako % od vrchu
-        const liquidTopPercent = darkPixels > 100 ? Math.round((minY / h) * 100) : null;
-        const liquidBottomPercent = darkPixels > 100 ? Math.round((maxY / h) * 100) : null;
-        const estimatedFill = darkPixels > 100 ? Math.round(100 - (minY / h * 100)) : null;
+        // 5. Odhadni fill %
+        if (darkCount > 500) {
+          const liquidTopPct = Math.round((minY / h) * 100);
+          const fillEst = Math.round(100 - liquidTopPct);
+          window.pixelHint = 'Pixel analysis: dark liquid region found from row ' + minY + ' to ' + maxY + ' of ' + h + 'px. Liquid surface at ' + liquidTopPct + '% from image top = approximately ' + fillEst + '% full. Threshold: ' + autoThresh + '.';
+        } else {
+          window.pixelHint = 'Pixel analysis: liquid region unclear, use visual estimation.';
+        }
 
-        window.pixelHint = darkPixels > 100 
-          ? `Pixel analysis: liquid detected in rows ${minY}-${maxY} of ${h} total pixels. Liquid top at ${liquidTopPercent}% from image top, bottom at ${liquidBottomPercent}%. Estimated fill: ~${estimatedFill}%. Aspect ratio of liquid region: ${aspectRatio.toFixed(2)}.`
-          : 'Pixel analysis: could not detect liquid region clearly.';
-
-        // Pošli farebnú fotku do AI (nie čiernobielu)
-        const aiCanvas = document.createElement('canvas');
-        aiCanvas.width = w; aiCanvas.height = h;
-        aiCanvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        const aiJpeg = aiCanvas.toDataURL('image/jpeg', 0.85);
-        base64Data = aiJpeg.split(',')[1];
+        // Posli farebnú fotku do AI (nie ciernobielu)
+        base64Data = colorJpeg.split(',')[1];
         document.getElementById('analyzeBtn').disabled = false;
         document.getElementById('output').innerHTML = '';
       };
       img.onerror = () => {
-        document.getElementById('output').innerHTML = `<div class="error-box"> Nepodporovan'fd form'e1t. Pou'9ei JPG, PNG alebo WebP.</div>`;
+        document.getElementById('output').innerHTML = `<div class="error-box">❌ Nepodporovaný formát. Použi JPG, PNG alebo WebP.</div>`;
       };
       img.src = dataUrl;
     };
@@ -698,7 +684,7 @@
 
   async function analyze() {
     if (!base64Data || !token || !currentInventory) return;
-    document.getElementById('output').innerHTML = `<div class="loading"><div class="spinner"></div><p>Analyzujem fa'9au...</p></div>`;
+    document.getElementById('output').innerHTML = `<div class="loading"><div class="spinner"></div><p>Analyzujem fľašu...</p></div>`;
     document.getElementById('analyzeBtn').disabled = true;
     try {
       const res = await fetch(SUPABASE_URL + '/functions/v1/super-endpoint', {
@@ -710,12 +696,12 @@
       if (r.error) throw new Error(r.error);
       const color = getColor(r.remainingPercent);
       document.getElementById('scanCounter').textContent = r.scansUsed + ' / 150';
-      const dupMsg = r.duplicate ? `<div class="success-box" style="background:#2A2A1A;border-color:#5A5A2A;color:#FFD700;"> T'e1to fotka u'9e bola analyzovan'e1 '97 zobrazujeme ulo'9een'fd v'fdsledok.</div>` : '';
+      const dupMsg = r.duplicate ? `<div class="success-box" style="background:#2A2A1A;border-color:#5A5A2A;color:#FFD700;">⚠️ Táto fotka už bola analyzovaná — zobrazujeme uložený výsledok.</div>` : '';
       document.getElementById('output').innerHTML = dupMsg + `
         <div class="result-card">
           <div class="brand">${r.brand}</div>
           <div class="vol-row">
-            <div class="vol-item"><span class="vol-label">Celkov'fd objem</span><span class="vol-value">${r.totalVolumeMl} ml</span></div>
+            <div class="vol-item"><span class="vol-label">Celkový objem</span><span class="vol-value">${r.totalVolumeMl} ml</span></div>
             <div class="vol-divider"></div>
             <div class="vol-item"><span class="vol-label">Zostatok</span><span class="vol-value" style="color:${color}">${r.remainingMl} ml</span></div>
           </div>
@@ -727,30 +713,30 @@
         </div>`;
       if (!r.duplicate) await loadActiveScans();
     } catch (e) {
-      document.getElementById('output').innerHTML = `<div class="error-box"> ${e.message}</div>`;
+      document.getElementById('output').innerHTML = `<div class="error-box">❌ ${e.message}</div>`;
     } finally {
       document.getElementById('analyzeBtn').disabled = false;
     }
   }
 
   async function exportExcel() {
-    if (!detailScans.length) { alert(''8eiadne d'e1ta'); return; }
+    if (!detailScans.length) { alert('Žiadne dáta'); return; }
     const rows = detailScans.map(s => ({
-      'Znaka': s.brand,
+      'Značka': s.brand,
       'Zostatok (ml)': s.remaining_ml,
       'Zostatok (%)': s.remaining_percent,
       'EAN': s.ean || '',
-      'D'e1tum a as': new Date(s.created_at).toLocaleString('sk-SK')
+      'Dátum a čas': new Date(s.created_at).toLocaleString('sk-SK')
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     ws['!cols'] = [{wch:35},{wch:15},{wch:13},{wch:20},{wch:20}];
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Invent'fara');
-    XLSX.writeFile(wb, `PourAI_${detailInventory.name.replace(//g,'_')}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventúra');
+    XLSX.writeFile(wb, `PourAI_${detailInventory.name.replace(/\s/g,'_')}.xlsx`);
   }
 
   async function exportPDF() {
-    if (!detailScans.length) { alert(''8eiadne d'e1ta'); return; }
+    if (!detailScans.length) { alert('Žiadne dáta'); return; }
     const rows = detailScans.map(s => `<tr>
       <td>${s.brand}</td>
       <td style="text-align:center">${s.remaining_ml}ml</td>
@@ -769,12 +755,12 @@
       td{padding:9px 12px;border-bottom:1px solid #eee;}
       tr:nth-child(even) td{background:#f9f9f9;}
     </style></head><body>
-    <h1> PourAI '97 ${detailInventory.name}</h1>
-    <div class="meta">Exportovan'e9: ${new Date().toLocaleString('sk-SK')}</div>
-    <div class="count">Poet fa'9a'ed: <strong>${detailScans.length}</strong></div>
-    <table><thead><tr><th>Znaka</th><th>Zostatok</th><th>%</th><th>EAN</th><th>D'e1tum</th></tr></thead>
+    <h1>🍾 PourAI — ${detailInventory.name}</h1>
+    <div class="meta">Exportované: ${new Date().toLocaleString('sk-SK')}</div>
+    <div class="count">Počet fľaší: <strong>${detailScans.length}</strong></div>
+    <table><thead><tr><th>Značka</th><th>Zostatok</th><th>%</th><th>EAN</th><th>Dátum</th></tr></thead>
     <tbody>${rows}</tbody></table>
-    <script>window.onload=()=>{window.print()}</script>
+    <script>window.onload=()=>{window.print()}<\/script>
     </body></html>`;
     const win = window.open('','_blank');
     win.document.write(html);
@@ -782,4 +768,4 @@
   }
 </script>
 </body>
-</html>}
+</html>
