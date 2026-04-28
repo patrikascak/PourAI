@@ -724,7 +724,10 @@
         }
         aiCtx.putImageData(aiImageData, 0, 0);
         const aiJpeg = aiCanvas.toDataURL('image/jpeg', 0.90);
-        base64Data = aiJpeg.split(',')[1];
+        // Uloz obe verzie oddelene
+        window.colorBase64 = colorJpeg.split(',')[1];
+        window.binaryBase64 = aiJpeg.split(',')[1];
+        base64Data = window.colorBase64;  // fallback
         document.getElementById('analyzeBtn').disabled = false;
         document.getElementById('output').innerHTML = '';
       };
@@ -750,7 +753,7 @@
       const res = await fetch(SUPABASE_URL + '/functions/v1/super-endpoint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': SUPABASE_KEY },
-        body: JSON.stringify({ image: base64Data, inventory_id: currentInventory.id, image_hash: window.currentImageHash, pixel_hint: window.pixelHint || null })
+        body: JSON.stringify({ color_image: window.colorBase64 || base64Data, binary_image: window.binaryBase64 || null, image: base64Data, inventory_id: currentInventory.id, image_hash: window.currentImageHash, pixel_hint: window.pixelHint || null })
       });
       const r = await res.json();
       if (r.error) throw new Error(r.error);
