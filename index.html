@@ -603,28 +603,27 @@
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
 
-        // Farebná fotka pre UI
+        // Zobraz farebnú fotku v UI
         const colorJpeg = canvas.toDataURL('image/jpeg', 0.85);
         document.getElementById('imageBox').innerHTML = `<img src="${colorJpeg}" />`;
 
-        // PIXEL ANALÝZA - grayscale + blur + threshold + bounding box
+        // === PIXEL ANALÝZA PODĽA ČLÁNKU ===
         const imageData = ctx.getImageData(0, 0, w, h);
         const px = imageData.data;
 
-        // 1. Grayscale
+        // 1. Grayscale (single channel ako v článku)
         const grayArr = new Uint8Array(w * h);
         for (let i = 0; i < w * h; i++) {
           grayArr[i] = Math.round(0.299 * px[i*4] + 0.587 * px[i*4+1] + 0.114 * px[i*4+2]);
         }
 
-        // 2. Box blur 7x7
+        // 2. Gaussian blur 7x7 (ako v článku cv2.GaussianBlur 7x7)
         const blurred = new Uint8Array(w * h);
-        const br = 3;
         for (let y = 0; y < h; y++) {
           for (let x = 0; x < w; x++) {
             let sum = 0, cnt = 0;
-            for (let dy = -br; dy <= br; dy++) {
-              for (let dx = -br; dx <= br; dx++) {
+            for (let dy = -3; dy <= 3; dy++) {
+              for (let dx = -3; dx <= 3; dx++) {
                 const nx = x+dx, ny = y+dy;
                 if (nx>=0 && nx<w && ny>=0 && ny<h) { sum += grayArr[ny*w+nx]; cnt++; }
               }
@@ -633,38 +632,99 @@
           }
         }
 
-        // 3. Auto threshold - spodnych 25% najtemnejsich pixelov = tekutina
+        // 3. Histogram - nájdi threshold (ako v článku - spodná časť histogramu = tekutina)
         const hist = new Array(256).fill(0);
         for (let i = 0; i < blurred.length; i++) hist[blurred[i]]++;
-        let cumul = 0, autoThresh = 80;
+
+        // Nájdi valley medzi dvoma peakmi (tekutina vs pozadie)
+        // Použij Otsu-like threshold
+        let total = w * h, sum = 0;
+        for (let i = 0; i < 256; i++) sum += i * hist[i];
+        let sumB = 0, wB = 0, maxVar = 0, threshold = 50;
         for (let i = 0; i < 256; i++) {
-          cumul += hist[i];
-          if (cumul > blurred.length * 0.25) { autoThresh = i; break; }
+          wB += hist[i]; if (wB === 0) continue;
+          const wF = total - wB; if (wF === 0) break;
+          sumB += i * hist[i];
+          const mB = sumB / wB, mF = (sum - sumB) / wF;
+          const varBetween = wB * wF * (mB - mF) * (mB - mF);
+          if (varBetween > maxVar) { maxVar = varBetween; threshold = i; }
         }
 
-        // 4. Bounding box tmavej oblasti (strednych 60% sirky - ignoruj okraje)
-        let minY = h, maxY = 0, darkCount = 0;
+        // 4. Inverted binary threshold (tmavé pixely = tekutina, ako THRESH_BINARY_INV v článku)
+        const binary = new Uint8Array(w * h);
+        for (let i = 0; i < blurred.length; i++) {
+          binary[i] = blurred[i] < threshold ? 255 : 0;
+        }
+
+        // 5. Morphological opening 5x5 (ako v článku - odstráni noise)
+        const opened = new Uint8Array(w * h);
+        const eroded = new Uint8Array(w * h);
+        // Erózia
+        for (let y = 2; y < h-2; y++) {
+          for (let x = 2; x < w-2; x++) {
+            let min = 255;
+            for (let dy = -2; dy <= 2; dy++)
+              for (let dx = -2; dx <= 2; dx++)
+                if (binary[(y+dy)*w+(x+dx)] < min) min = binary[(y+dy)*w+(x+dx)];
+            eroded[y*w+x] = min;
+          }
+        }
+        // Dilatácia
+        for (let y = 2; y < h-2; y++) {
+          for (let x = 2; x < w-2; x++) {
+            let max = 0;
+            for (let dy = -2; dy <= 2; dy++)
+              for (let dx = -2; dx <= 2; dx++)
+                if (eroded[(y+dy)*w+(x+dx)] > max) max = eroded[(y+dy)*w+(x+dx)];
+            opened[y*w+x] = max;
+          }
+        }
+
+        // 6. Nájdi najväčší contour (bounding box) - ako v článku
+        let minY = h, maxY = 0, minX = w, maxX = 0, darkCount = 0;
         for (let y = 0; y < h; y++) {
-          for (let x = Math.floor(w*0.2); x < Math.floor(w*0.8); x++) {
-            if (blurred[y*w+x] < autoThresh) {
+          for (let x = 0; x < w; x++) {
+            if (opened[y*w+x] === 255) {
               darkCount++;
               if (y < minY) minY = y;
               if (y > maxY) maxY = y;
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
             }
           }
         }
 
-        // 5. Odhadni fill %
-        if (darkCount > 500) {
+        // 7. Aspect ratio ako v článku (w/h tekutiny)
+        const liqW = maxX - minX;
+        const liqH = maxY - minY;
+        const aspectRatio = liqH > 0 ? (liqW / liqH).toFixed(2) : 0;
+
+        // 8. Vypočítaj fill % - hladina = minY (vrch tmavej oblasti)
+        let pixelFillPct = null;
+        if (darkCount > 200) {
           const liquidTopPct = Math.round((minY / h) * 100);
-          const fillEst = Math.round(100 - liquidTopPct);
-          window.pixelHint = 'Pixel analysis: dark liquid region found from row ' + minY + ' to ' + maxY + ' of ' + h + 'px. Liquid surface at ' + liquidTopPct + '% from image top = approximately ' + fillEst + '% full. Threshold: ' + autoThresh + '.';
+          pixelFillPct = 100 - liquidTopPct;
+          window.pixelHint = 'Pixel analysis (Gaussian blur + Otsu threshold + morphological opening): liquid region bounding box top=' + minY + 'px, bottom=' + maxY + 'px, image height=' + h + 'px. Liquid surface at ' + liquidTopPct + '% from top = bottle is approximately ' + pixelFillPct + '% full. Aspect ratio of liquid region: ' + aspectRatio + '. Threshold used: ' + threshold + '.';
         } else {
-          window.pixelHint = 'Pixel analysis: liquid region unclear, use visual estimation.';
+          window.pixelHint = 'Pixel analysis: could not isolate liquid region clearly (dark pixels: ' + darkCount + '). Use visual estimation only.';
         }
 
-        // Posli farebnú fotku do AI (nie ciernobielu)
-        base64Data = colorJpeg.split(',')[1];
+        // 9. Vytvor čiernobielu verziu pre AI (vysoký kontrast)
+        const aiCanvas = document.createElement('canvas');
+        aiCanvas.width = w; aiCanvas.height = h;
+        const aiCtx = aiCanvas.getContext('2d');
+        const aiImageData = aiCtx.createImageData(w, h);
+        for (let i = 0; i < w * h; i++) {
+          // Vysoký kontrast čiernobiela
+          const v = blurred[i] < threshold ? 0 : 255;
+          aiImageData.data[i*4] = v;
+          aiImageData.data[i*4+1] = v;
+          aiImageData.data[i*4+2] = v;
+          aiImageData.data[i*4+3] = 255;
+        }
+        aiCtx.putImageData(aiImageData, 0, 0);
+        const aiJpeg = aiCanvas.toDataURL('image/jpeg', 0.90);
+        base64Data = aiJpeg.split(',')[1];
         document.getElementById('analyzeBtn').disabled = false;
         document.getElementById('output').innerHTML = '';
       };
